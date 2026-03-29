@@ -29,21 +29,20 @@ import {
     deleteEmployee,
 } from "../controllers/employee.controller.js";
 
-// TODO: uncomment as each controller is built
-// import {
-//     issueAccessBadge,
-//     getAllAccessBadges,
-//     getAccessBadgeById,
-//     deactivateAccessBadge,
-//     getEmployeeBadgeHistory,
-// } from "../controllers/accessBadge.controller.js";
+import {
+    issueAccessBadge,
+    getAllAccessBadges,
+    getAccessBadgeById,
+    deactivateAccessBadge,
+    getEmployeeBadgeHistory,
+} from "../controllers/accessBadge.controller.js";
 
-// import {
-//     createParkingRecord,
-//     getAllParkingRecords,
-//     getParkingRecordById,
-//     cancelParkingRecord,
-// } from "../controllers/parkingRecord.controller.js";
+import {
+    createParkingRecord,
+    getAllParkingRecords,
+    getParkingRecordById,
+    cancelParkingRecord,
+} from "../controllers/parkingRecord.controller.js";
 
 // import {
 //     createRentalContract,
@@ -89,17 +88,17 @@ router.route("/employees/:id/vehicles/:plateNumber").delete(verifyJWT, isAdmin, 
 router.route("/employees/:id").delete(verifyJWT, isAdmin, deleteEmployee);
 
 // ── Access Badge Routes ──
-// router.route("/badges").post(verifyJWT, isAdmin, issueAccessBadge);
-// router.route("/badges").get(verifyJWT, isAdmin, getAllAccessBadges);
-// router.route("/badges/:id").get(verifyJWT, isAdmin, getAccessBadgeById);
-// router.route("/badges/:id/deactivate").patch(verifyJWT, isAdmin, deactivateAccessBadge);
-// router.route("/badges/employee/:employeeId/history").get(verifyJWT, isAdmin, getEmployeeBadgeHistory);
+router.route("/badges").post(verifyJWT, isAdmin, issueAccessBadge);
+router.route("/badges").get(verifyJWT, isAdmin, getAllAccessBadges);
+router.route("/badges/:id").get(verifyJWT, isAdmin, getAccessBadgeById);
+router.route("/badges/:id/deactivate").patch(verifyJWT, isAdmin, deactivateAccessBadge);
+router.route("/badges/employee/:employeeId/history").get(verifyJWT, isAdmin, getEmployeeBadgeHistory);
 
 // ── Parking Record Routes ──
-// router.route("/parking").post(verifyJWT, isAdmin, createParkingRecord);
-// router.route("/parking").get(verifyJWT, isAdmin, getAllParkingRecords);
-// router.route("/parking/:id").get(verifyJWT, isAdmin, getParkingRecordById);
-// router.route("/parking/:id/cancel").patch(verifyJWT, isAdmin, cancelParkingRecord);
+router.route("/parking").post(verifyJWT, isAdmin, createParkingRecord);
+router.route("/parking").get(verifyJWT, isAdmin, getAllParkingRecords);
+router.route("/parking/:id").get(verifyJWT, isAdmin, getParkingRecordById);
+router.route("/parking/:id/cancel").patch(verifyJWT, isAdmin, cancelParkingRecord);
 
 // ── Rental Contract Routes ──
 // router.route("/rental-contracts").post(verifyJWT, isAdmin, createRentalContract);
