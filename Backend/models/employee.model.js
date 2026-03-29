@@ -7,12 +7,6 @@ const employeeSchema = new Schema(
     full_name: { type: String, required: true },
     id_card_number: { type: String },
 
-    employee_type: {
-      type: String,
-      enum: ["TENANT", "NON_TENANT", "MANAGEMENT"],
-      default: "TENANT",
-    },
-
     job_title: { type: String },
 
     vehicles: [
@@ -26,7 +20,7 @@ const employeeSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["ACTIVE", "INACTIVE", "LEFT"],
+      enum: ["ACTIVE", "INACTIVE"],
       default: "ACTIVE",
     },
 
