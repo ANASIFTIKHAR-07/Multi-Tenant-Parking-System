@@ -43,4 +43,26 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/admin", adminRouter)
 app.use("/api/v1/csv", csvRouter)
 
+
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
+    statusCode,
+    success: false,
+    message: err.message || "Internal Server Error",
+    errors: err.errors || [],
+    data: null,
+  });
+});
+
 export { app }

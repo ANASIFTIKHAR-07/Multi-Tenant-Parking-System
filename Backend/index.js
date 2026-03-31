@@ -3,9 +3,16 @@ dns.setServers(["8.8.8.8", "1.1.1.1"]);
 import connectDB from "./db/index.js";
 import { app } from "./app.js";
 import "dotenv/config";
+import { scheduleContractExpiryJob, updateContractStatuses } from "./crons/contactExpiry.cron.js";
 
 connectDB()
-  .then(() => {
+  .then(async () => {
+
+    await updateContractStatuses();
+
+    // Schedule daily midnight job
+    scheduleContractExpiryJob();
+
     // For Unexpected erros
     app.on("error", (error) => {
       console.log(

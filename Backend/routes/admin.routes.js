@@ -44,22 +44,22 @@ import {
     cancelParkingRecord,
 } from "../controllers/parkingRecord.controller.js";
 
-// import {
-//     createRentalContract,
-//     getAllRentalContracts,
-//     getRentalContractById,
-//     updateRentalContract,
-//     deleteRentalContract,
-// } from "../controllers/rentalContract.controller.js";
+import {
+    createRentalContract,
+    getAllRentalContracts,
+    getRentalContractById,
+    updateRentalContract,
+    deleteRentalContract,
+} from "../controllers/rentalContract.controller.js";
 
-// import {
-//     issueVisitorCard,
-//     getAllVisitorCards,
-//     getVisitorCardById,
-//     checkInVisitor,
-//     checkOutVisitor,
-//     deactivateVisitorCard,
-// } from "../controllers/visitorCard.controller.js";
+import {
+    issueVisitorCard,
+    getAllVisitorCards,
+    getVisitorCardById,
+    checkInVisitor,
+    checkOutVisitor,
+    deactivateVisitorCard,
+} from "../controllers/visitorCard.controller.js";
 
 const router = Router();
 
@@ -101,18 +101,18 @@ router.route("/parking/:id").get(verifyJWT, isAdmin, getParkingRecordById);
 router.route("/parking/:id/cancel").patch(verifyJWT, isAdmin, cancelParkingRecord);
 
 // ── Rental Contract Routes ──
-// router.route("/rental-contracts").post(verifyJWT, isAdmin, createRentalContract);
-// router.route("/rental-contracts").get(verifyJWT, isAdmin, getAllRentalContracts);
-// router.route("/rental-contracts/:id").get(verifyJWT, isAdmin, getRentalContractById);
-// router.route("/rental-contracts/:id").patch(verifyJWT, isAdmin, updateRentalContract);
-// router.route("/rental-contracts/:id").delete(verifyJWT, isAdmin, deleteRentalContract);
+router.route("/rental-contracts").post(verifyJWT, isAdmin, createRentalContract);
+router.route("/rental-contracts").get(verifyJWT, isAdmin, getAllRentalContracts);
+router.route("/rental-contracts/:id").get(verifyJWT, isAdmin, getRentalContractById);
+router.route("/rental-contracts/:id").patch(verifyJWT, isAdmin, updateRentalContract);
+router.route("/rental-contracts/:id").delete(verifyJWT, isAdmin, deleteRentalContract);
 
 // ── Visitor Card Routes ──
-// router.route("/visitor-cards").post(verifyJWT, isAdmin, issueVisitorCard);
-// router.route("/visitor-cards").get(verifyJWT, isAdmin, getAllVisitorCards);
-// router.route("/visitor-cards/:id").get(verifyJWT, isAdmin, getVisitorCardById);
-// router.route("/visitor-cards/:id/check-in").patch(verifyJWT, isAdmin, checkInVisitor);
-// router.route("/visitor-cards/:id/check-out").patch(verifyJWT, isAdmin, checkOutVisitor);
-// router.route("/visitor-cards/:id/deactivate").patch(verifyJWT, isAdmin, deactivateVisitorCard);
+router.route("/visitor-cards").post(verifyJWT, isAdmin, issueVisitorCard);
+router.route("/visitor-cards").get(verifyJWT, isAdmin, getAllVisitorCards);
+router.route("/visitor-cards/:id").get(verifyJWT, isAdmin, getVisitorCardById);
+router.route("/visitor-cards/:id/check-in").patch(verifyJWT, isAdmin, checkInVisitor);
+router.route("/visitor-cards/:id/check-out").patch(verifyJWT, isAdmin, checkOutVisitor);
+router.route("/visitor-cards/:id/deactivate").patch(verifyJWT, isAdmin, deactivateVisitorCard);
 
 export default router;
