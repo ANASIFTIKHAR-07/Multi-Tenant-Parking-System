@@ -13,10 +13,7 @@ export async function httpRequest(path, { method = 'GET', body, headers = {}, qu
   const response = await fetch(url.toString(), {
     method,
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers,
-    },
+    headers: { 'Content-Type': 'application/json', ...headers },
     body: body ? JSON.stringify(body) : undefined,
   });
 
@@ -28,13 +25,13 @@ export async function httpRequest(path, { method = 'GET', body, headers = {}, qu
     const message = isJSON ? (data?.message || data?.error || 'Request failed') : data;
     throw new Error(message);
   }
-  // Return the full response data instead of extracting data.data
   return data;
 }
 
 export const http = {
   get: (path, options) => httpRequest(path, { ...options, method: 'GET' }),
   post: (path, body, options) => httpRequest(path, { ...options, method: 'POST', body }),
+  patch: (path, body, options) => httpRequest(path, { ...options, method: 'PATCH', body }),
   put: (path, body, options) => httpRequest(path, { ...options, method: 'PUT', body }),
   del: (path, options) => httpRequest(path, { ...options, method: 'DELETE' }),
 };
