@@ -6,9 +6,7 @@ import jwt from "jsonwebtoken";
       
 const generateAndStoreTokens = async (userId) => {
   try {
-    console.log("Looking up Admin by ID:", userId);
     const admin = await Admin.findById(userId);
-    console.log("generateAndStoreTokens called with userId:", userId);
     if (!admin) {
       throw new ApiError(404, "Admin not found!");
     }
@@ -19,6 +17,7 @@ const generateAndStoreTokens = async (userId) => {
     await admin.save({ validateBeforeSave: false });
     return { accessToken, refreshToken };
   } catch (error) {
+    if (error instanceof ApiError) throw error;
     throw new ApiError(
       500,
       "Something went wrong while generating Access Token & Refresh Token"
@@ -152,7 +151,8 @@ const accessRefreshToken = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    throw new ApiError(401, error?.message || "Invalid Refresh Token!");
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(401, "Invalid Refresh Token!");
   }
 });
 
