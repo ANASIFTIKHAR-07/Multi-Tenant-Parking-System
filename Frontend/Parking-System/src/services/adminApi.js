@@ -1,4 +1,4 @@
-import { http } from './http.js';
+import { http, downloadCsv } from './http.js';
 
 // Units
 export const fetchUnits = (query) => http.get('/admin/units', { query });
@@ -50,20 +50,8 @@ export const checkInVisitor = (id) => http.patch(`/admin/visitor-cards/${id}/che
 export const checkOutVisitor = (id) => http.patch(`/admin/visitor-cards/${id}/check-out`);
 export const deactivateVisitorCard = (id, payload) => http.patch(`/admin/visitor-cards/${id}/deactivate`, payload);
 
-// CSV Exports
-export const exportParkingRecordsCSV = (query) => {
-  const params = new URLSearchParams(query || {});
-  return `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/csv/parking-records?${params}`;
-};
-export const exportTenantsCSV = (query) => {
-  const params = new URLSearchParams(query || {});
-  return `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/csv/tenants?${params}`;
-};
-export const exportBadgesCSV = (query) => {
-  const params = new URLSearchParams(query || {});
-  return `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/csv/badges?${params}`;
-};
-export const exportRentalContractsCSV = (query) => {
-  const params = new URLSearchParams(query || {});
-  return `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/csv/rental-contracts?${params}`;
-};
+// CSV Exports (cookies + optional refresh; triggers browser download)
+export const exportParkingRecordsCSV = (query) => downloadCsv('/csv/parking-records', query);
+export const exportTenantsCSV = (query) => downloadCsv('/csv/tenants', query);
+export const exportBadgesCSV = (query) => downloadCsv('/csv/badges', query);
+export const exportRentalContractsCSV = (query) => downloadCsv('/csv/rental-contracts', query);

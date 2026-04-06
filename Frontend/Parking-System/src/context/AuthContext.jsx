@@ -23,16 +23,16 @@ export function AuthProvider({ children }) {
     const payload = res?.message;
     const adminData = payload?.loggedInAdmin ?? null;
     setAdmin(adminData);
-    if (payload?.accessToken) localStorage.setItem('token', payload.accessToken);
-    if (payload?.refreshToken) localStorage.setItem('refreshToken', payload.refreshToken);
     return res;
   };
 
   const logout = async () => {
-    try { await auth.logout(); } catch {}
+    try {
+      await auth.logout();
+    } catch {
+      /* ignore: best-effort logout */
+    }
     setAdmin(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
   };
 
   const value = useMemo(() => ({ admin, loading, login, logout }), [admin, loading]);

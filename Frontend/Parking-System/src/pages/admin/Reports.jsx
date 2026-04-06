@@ -63,10 +63,14 @@ export default function Reports() {
   const [badgeFilters, setBadgeFilters] = useState({});
   const [contractFilters, setContractFilters] = useState({});
 
-  const doExport = (urlFn, filters) => {
-    const clean = Object.fromEntries(Object.entries(filters).filter(([, v]) => v));
-    const url = urlFn(clean);
-    window.open(url, '_blank');
+  const doExport = async (exportFn, filters) => {
+    setError('');
+    try {
+      const clean = Object.fromEntries(Object.entries(filters).filter(([, v]) => v));
+      await exportFn(clean);
+    } catch (e) {
+      setError(e.message || 'Export failed');
+    }
   };
 
   return (
@@ -85,7 +89,7 @@ export default function Reports() {
         </svg>
         <div>
           <p className="text-sm font-semibold text-blue-800">CSV Export</p>
-          <p className="text-sm text-blue-600 mt-0.5">Apply optional filters before exporting. Files will open in a new tab and download automatically. Exports require an active session.</p>
+          <p className="text-sm text-blue-600 mt-0.5">Apply optional filters before exporting. The file downloads in your browser using your current session (cookies). If your session expired, we refresh it once before exporting.</p>
         </div>
       </div>
 
