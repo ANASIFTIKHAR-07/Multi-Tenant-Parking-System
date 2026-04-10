@@ -11,3 +11,6 @@ export const me = () =>
 
 export const refresh = () =>
   http.post('/auth/refresh-token')
+
+export const changePassword = (payload) =>
+  http.patch('/auth/change-password', payload)

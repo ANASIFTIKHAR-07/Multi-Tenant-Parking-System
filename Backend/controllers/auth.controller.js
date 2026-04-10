@@ -17,10 +17,11 @@ const generateAndStoreTokens = async (userId) => {
     await admin.save({ validateBeforeSave: false });
     return { accessToken, refreshToken };
   } catch (error) {
+    console.error("generateAndStoreTokens error:", error);
     if (error instanceof ApiError) throw error;
     throw new ApiError(
       500,
-      "Something went wrong while generating Access Token & Refresh Token"
+      `Token generation failed: ${error.message}`
     );
   }
 };
@@ -166,10 +167,45 @@ const getCurrentAdmin = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, req.user, "User Fetched Successfully."));
 });
 
+const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    throw new ApiError(400, "currentPassword and newPassword are required");
+  }
+
+  if (newPassword.length < 6) {
+    throw new ApiError(400, "New password must be at least 6 characters");
+  }
+
+  if (currentPassword === newPassword) {
+    throw new ApiError(400, "New password must be different from the current password");
+  }
+
+  // Fetch with password field (req.user has it stripped)
+  const admin = await Admin.findById(req.user._id);
+  if (!admin) {
+    throw new ApiError(404, "Admin not found");
+  }
+
+  const isCorrect = await admin.isPasswordCorrect(currentPassword);
+  if (!isCorrect) {
+    throw new ApiError(400, "Current password is incorrect");
+  }
+
+  admin.password = newPassword; // pre-save hook will hash it
+  await admin.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password changed successfully"));
+});
+
 export {
   login,
   logout,
   accessRefreshToken,
   getCurrentAdmin,
+  changePassword,
   generateAndStoreTokens,
 };

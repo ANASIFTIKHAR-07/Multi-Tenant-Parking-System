@@ -8,30 +8,95 @@
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {
-    @apply bg-slate-50 text-slate-900;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    @apply bg-[#F4F6FA] text-slate-900;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  /* Refined scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-slate-200 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-slate-300; }
+
+  /* Input focus ring consistency */
+  input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: none;
   }
-  ::-webkit-scrollbar-track {
-    @apply bg-transparent;
+}
+
+@layer components {
+  /* Enterprise table row */
+  .table-row-hover {
+    @apply hover:bg-slate-50/80 transition-colors duration-100;
   }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-slate-200 rounded-full;
+
+  /* Sidebar nav active pill */
+  .nav-active {
+    @apply bg-blue-600 text-white shadow-sm;
   }
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-300;
+  .nav-inactive {
+    @apply text-slate-500 hover:bg-slate-100 hover:text-slate-800;
+  }
+
+  /* Card surface */
+  .card {
+    @apply bg-white rounded-2xl border border-slate-200/70 shadow-sm;
+  }
+
+  /* Primary action button */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700
+           text-white text-sm font-semibold rounded-xl shadow-sm shadow-blue-500/20
+           transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 text-slate-600 hover:bg-slate-100
+           hover:text-slate-800 text-sm font-semibold rounded-xl transition-all duration-150;
+  }
+
+  /* Danger button */
+  .btn-danger {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700
+           text-white text-sm font-semibold rounded-xl shadow-sm shadow-red-500/20
+           transition-all duration-150 disabled:opacity-50;
+  }
+
+  /* Form input */
+  .form-input {
+    @apply w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900
+           placeholder-slate-400 bg-white transition-all duration-150 outline-none
+           hover:border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10;
+  }
+
+  /* Section header */
+  .section-label {
+    @apply text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em];
   }
 }
 
 @layer utilities {
   .w-4\.5 { width: 1.125rem; }
   .h-4\.5 { height: 1.125rem; }
+
+  /* Subtle grid background for hero areas */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgb(148 163 184 / 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(148 163 184 / 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Noise texture overlay */
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+
+  .text-balance { text-wrap: balance; }
 }

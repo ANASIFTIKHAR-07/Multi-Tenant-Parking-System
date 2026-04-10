@@ -13,6 +13,7 @@ import ParkingRecords from './pages/admin/ParkingRecords.jsx';
 import RentalContracts from './pages/admin/RentalContracts.jsx';
 import VisitorCards from './pages/admin/VisitorCards.jsx';
 import Reports from './pages/admin/Reports.jsx';
+import Profile from './pages/admin/Profile.jsx';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
               <Route path="rental-contracts" element={<RentalContracts />} />
               <Route path="visitor-cards" element={<VisitorCards />} />
               <Route path="reports" element={<Reports />} />
+              <Route path="profile" element={<Profile />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
