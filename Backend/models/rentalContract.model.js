@@ -29,6 +29,6 @@ const rentalContractSchema = new Schema(
 
 rentalContractSchema.index({ tenant_id: 1 });
 rentalContractSchema.index({ status: 1, end_date: 1 });
-rentalContractSchema.index({ contract_ref_number: 1 }, { unique: true });
+// contract_ref_number unique index is already defined via `unique: true` on the field
 
 export const RentalContract = mongoose.models.RentalContract || mongoose.model("RentalContract", rentalContractSchema);

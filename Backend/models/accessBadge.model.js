@@ -9,7 +9,7 @@ const accessBadgeSchema = new Schema(
     },
     tenant_id: { type: Schema.Types.ObjectId, ref: "Tenant", required: true },
 
-    badge_number: { type: Number, required: true },
+    badge_number: { type: Number, required: true, unique: true },
     sr_number: { type: String },
     sr_number_secondary: { type: Number },
 
@@ -35,7 +35,6 @@ const accessBadgeSchema = new Schema(
   { timestamps: true }
 );
 
-accessBadgeSchema.index({ badge_number: 1 }, { unique: true });
 accessBadgeSchema.index({ employee_id: 1 });
 accessBadgeSchema.index({ tenant_id: 1, status: 1 });
 accessBadgeSchema.index({ sr_number: 1 }, { sparse: true });
