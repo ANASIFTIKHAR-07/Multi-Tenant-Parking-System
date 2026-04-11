@@ -100,7 +100,7 @@ export default function ParkingRecords() {
 
   // When employee is selected — load their vehicles and auto-fill
   const handleEmployeeChange = (employeeId) => {
-    setForm(f => ({ ...f, employee_id: employeeId, car_plate_number: '', sticker_number: '', car_tag: '' }));
+    setForm(f => ({ ...f, employee_id: employeeId, car_plate_number: '', sticker_number: '', car_tag: '', badge_id: '', sr_number: '' }));
     setSelectedVehiclePlate('');
 
     if (!employeeId) { setSelectedEmployeeVehicles([]); return; }
@@ -109,11 +109,22 @@ export default function ParkingRecords() {
     const vehicles = emp?.vehicles ?? [];
     setSelectedEmployeeVehicles(vehicles);
 
+    // Auto-fill active badge info
+    const badge = emp?.active_badge;
+    if (badge) {
+      setForm(f => ({
+        ...f,
+        employee_id: employeeId,
+        badge_id:  badge.badge_number != null ? String(badge.badge_number) : '',
+        sr_number: badge.sr_number    || '',
+      }));
+    }
+
     if (vehicles.length === 0) return;
 
     // Auto-select primary vehicle, or first if none marked primary
     const primary = vehicles.find(v => v.is_primary) || vehicles[0];
-    applyVehicle(primary);
+    applyVehicle(primary, badge);
     setSelectedVehiclePlate(primary.car_plate_number);
   };
 
@@ -124,12 +135,17 @@ export default function ParkingRecords() {
     if (v) applyVehicle(v);
   };
 
-  const applyVehicle = (v) => {
+  const applyVehicle = (v, badge) => {
     setForm(f => ({
       ...f,
       car_plate_number: v.car_plate_number || '',
       sticker_number:   v.sticker_number   || '',
       car_tag:          v.car_tag != null   ? String(v.car_tag) : '',
+      // Only overwrite badge fields if badge is explicitly passed (on initial employee select)
+      ...(badge !== undefined ? {
+        badge_id:  badge?.badge_number != null ? String(badge.badge_number) : '',
+        sr_number: badge?.sr_number    || '',
+      } : {}),
     }));
   };
 
@@ -267,9 +283,18 @@ export default function ParkingRecords() {
           {/* Vehicle picker — shown when employee has vehicles */}
           {selectedEmployeeVehicles.length > 0 && (
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3">
-              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Registered Vehicles ({selectedEmployeeVehicles.length})
-              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                  Registered Vehicles ({selectedEmployeeVehicles.length})
+                </p>
+                {/* Show active badge info inline */}
+                {form.badge_id && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-[11px] font-semibold text-emerald-700">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    Badge #{form.badge_id}{form.sr_number ? ` · SR: ${form.sr_number}` : ''}
+                  </span>
+                )}
+              </div>
               <div className="grid grid-cols-1 gap-2">
                 {selectedEmployeeVehicles.map(v => (
                   <button

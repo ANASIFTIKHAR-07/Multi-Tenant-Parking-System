@@ -27,6 +27,20 @@
   input:focus-visible, select:focus-visible, textarea:focus-visible {
     outline: none;
   }
+
+  /* Cursor pointer on all interactive elements */
+  button,
+  [role="button"],
+  select,
+  label[for],
+  a[href],
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
 }
 
 @layer components {
