@@ -42,6 +42,7 @@ import {
     getAllParkingRecords,
     getParkingRecordById,
     cancelParkingRecord,
+    updateParkingRecord,
 } from "../controllers/parkingRecord.controller.js";
 
 import {
@@ -98,6 +99,7 @@ router.route("/badges/employee/:employeeId/history").get(verifyJWT, isAdmin, get
 router.route("/parking").post(verifyJWT, isAdmin, createParkingRecord);
 router.route("/parking").get(verifyJWT, isAdmin, getAllParkingRecords);
 router.route("/parking/:id").get(verifyJWT, isAdmin, getParkingRecordById);
+router.route("/parking/:id").patch(verifyJWT, isAdmin, updateParkingRecord);
 router.route("/parking/:id/cancel").patch(verifyJWT, isAdmin, cancelParkingRecord);
 
 // ── Rental Contract Routes ──

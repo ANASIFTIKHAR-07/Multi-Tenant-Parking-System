@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { fetchParkingRecords, createParkingRecord, cancelParkingRecord, fetchTenants, fetchEmployees, fetchRentalContracts } from '../../services/adminApi.js';
+import { fetchParkingRecords, createParkingRecord, cancelParkingRecord, updateParkingRecord, fetchTenants, fetchEmployees, fetchRentalContracts } from '../../services/adminApi.js';
 import PageHeader from '../../Components/common/PageHeader.jsx';
 import DataTable from '../../Components/common/DataTable.jsx';
 import Pagination from '../../Components/common/Pagination.jsx';
@@ -7,6 +7,12 @@ import Alert from '../../Components/common/Alert.jsx';
 import Modal from '../../Components/common/Modal.jsx';
 import StatusBadge from '../../Components/common/StatusBadge.jsx';
 import { TextInput, SelectInput, TextareaInput } from '../../Components/common/FormField.jsx';
+
+const EMPTY_FORM = {
+  employee_id: '', car_plate_number: '', parking_type: 'ASSIGNED',
+  badge_id: '', sticker_number: '', car_tag: '', sr_number: '',
+  slot_code: '', floor_number: '', rental_contract_id: '', remarks: '',
+};
 
 export default function ParkingRecords() {
   const [records, setRecords] = useState([]);
@@ -21,10 +27,13 @@ export default function ParkingRecords() {
   const [filters, setFilters] = useState({ tenant_id: '', parking_type: '', status: '' });
   const [modal, setModal] = useState(null);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ employee_id: '', car_plate_number: '', parking_type: 'ASSIGNED', badge_id: '', sticker_number: '', car_tag: '', sr_number: '', slot_code: '', floor_number: '', rental_contract_id: '', remarks: '' });
+  const [form, setForm] = useState(EMPTY_FORM);
   const [cancelForm, setCancelForm] = useState({ remarks: '' });
   const [submitting, setSubmitting] = useState(false);
   const [tenantFilter, setTenantFilter] = useState('');
+  // Track the selected employee's vehicles for the vehicle picker
+  const [selectedEmployeeVehicles, setSelectedEmployeeVehicles] = useState([]);
+  const [selectedVehiclePlate, setSelectedVehiclePlate] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -53,8 +62,76 @@ export default function ParkingRecords() {
     }).catch(() => {});
   }, [tenantFilter]);
 
-  const openCreate = () => { setForm({ employee_id: '', car_plate_number: '', parking_type: 'ASSIGNED', badge_id: '', sticker_number: '', car_tag: '', sr_number: '', slot_code: '', floor_number: '', rental_contract_id: '', remarks: '' }); setTenantFilter(''); setModal('create'); };
+  const openCreate = () => {
+    setForm(EMPTY_FORM);
+    setTenantFilter('');
+    setSelectedEmployeeVehicles([]);
+    setSelectedVehiclePlate('');
+    setModal('create');
+  };
   const openCancel = (r) => { setEditing(r); setCancelForm({ remarks: '' }); setModal('cancel'); };
+
+  const openEdit = (r) => {
+    setEditing(r);
+    setModal('edit');
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault(); setSubmitting(true); setError('');
+    try {
+      const payload = {
+        badge_id:       editing.editBadgeId       !== undefined ? (editing.editBadgeId       ? Number(editing.editBadgeId)       : null) : undefined,
+        sticker_number: editing.editStickerNumber !== undefined ? (editing.editStickerNumber || null) : undefined,
+        car_tag:        editing.editCarTag        !== undefined ? (editing.editCarTag        ? Number(editing.editCarTag)        : null) : undefined,
+        sr_number:      editing.editSrNumber      !== undefined ? (editing.editSrNumber      || null) : undefined,
+        remarks:        editing.editRemarks       !== undefined ? (editing.editRemarks       || null) : undefined,
+        ...(editing.parking_type === 'ASSIGNED' ? {
+          assigned_slot: {
+            slot_code:    editing.editSlotCode    || editing.assigned_slot?.slot_code,
+            floor_number: editing.editFloorNumber || editing.assigned_slot?.floor_number,
+          }
+        } : {}),
+      };
+      await updateParkingRecord(editing._id, payload);
+      setSuccess('Parking record updated.'); setModal(null); load();
+    } catch (e) { setError(e.message); }
+    finally { setSubmitting(false); }
+  };
+
+  // When employee is selected — load their vehicles and auto-fill
+  const handleEmployeeChange = (employeeId) => {
+    setForm(f => ({ ...f, employee_id: employeeId, car_plate_number: '', sticker_number: '', car_tag: '' }));
+    setSelectedVehiclePlate('');
+
+    if (!employeeId) { setSelectedEmployeeVehicles([]); return; }
+
+    const emp = employees.find(e => e._id === employeeId);
+    const vehicles = emp?.vehicles ?? [];
+    setSelectedEmployeeVehicles(vehicles);
+
+    if (vehicles.length === 0) return;
+
+    // Auto-select primary vehicle, or first if none marked primary
+    const primary = vehicles.find(v => v.is_primary) || vehicles[0];
+    applyVehicle(primary);
+    setSelectedVehiclePlate(primary.car_plate_number);
+  };
+
+  // When a specific vehicle is picked from the dropdown
+  const handleVehicleChange = (plate) => {
+    setSelectedVehiclePlate(plate);
+    const v = selectedEmployeeVehicles.find(v => v.car_plate_number === plate);
+    if (v) applyVehicle(v);
+  };
+
+  const applyVehicle = (v) => {
+    setForm(f => ({
+      ...f,
+      car_plate_number: v.car_plate_number || '',
+      sticker_number:   v.sticker_number   || '',
+      car_tag:          v.car_tag != null   ? String(v.car_tag) : '',
+    }));
+  };
 
   const handleCreate = async (e) => {
     e.preventDefault(); setSubmitting(true); setError('');
@@ -102,6 +179,9 @@ export default function ParkingRecords() {
     { key: 'assigned_at', label: 'Assigned', render: r => <span className="text-xs text-slate-500">{new Date(r.assigned_at).toLocaleDateString()}</span> },
     { key: 'actions', label: '', render: r => (
       <div className="flex items-center gap-1.5 justify-end">
+        {r.status === 'ACTIVE' && (
+          <button onClick={() => openEdit(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">Edit</button>
+        )}
         {r.status === 'ACTIVE' && (
           <button onClick={() => openCancel(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors">Cancel</button>
         )}
@@ -175,12 +255,74 @@ export default function ParkingRecords() {
               {tenants.map(t => <option key={t._id} value={t._id}>{t.company_name}</option>)}
             </select>
           </div>
-          <SelectInput label="Employee" required value={form.employee_id} onChange={e => setForm(f => ({ ...f, employee_id: e.target.value }))}>
+          <SelectInput label="Employee" required value={form.employee_id} onChange={e => handleEmployeeChange(e.target.value)}>
             <option value="">Select employee</option>
-            {employees.map(e => <option key={e._id} value={e._id}>{e.full_name}</option>)}
+            {employees.map(e => (
+              <option key={e._id} value={e._id}>
+                {e.full_name}{e.id_card_number ? ` — ${e.id_card_number}` : ''}
+              </option>
+            ))}
           </SelectInput>
+
+          {/* Vehicle picker — shown when employee has vehicles */}
+          {selectedEmployeeVehicles.length > 0 && (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                Registered Vehicles ({selectedEmployeeVehicles.length})
+              </p>
+              <div className="grid grid-cols-1 gap-2">
+                {selectedEmployeeVehicles.map(v => (
+                  <button
+                    key={v.car_plate_number}
+                    type="button"
+                    onClick={() => handleVehicleChange(v.car_plate_number)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all ${
+                      selectedVehiclePlate === v.car_plate_number
+                        ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-500/10'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      selectedVehiclePlate === v.car_plate_number ? 'bg-blue-600' : 'bg-slate-200'
+                    }`}>
+                      <svg className={`w-4 h-4 ${selectedVehiclePlate === v.car_plate_number ? 'text-white' : 'text-slate-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2 2h10l2-2z" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13px] font-bold font-mono text-slate-800">{v.car_plate_number}</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        {[v.sticker_number && `Sticker: ${v.sticker_number}`, v.car_tag && `Tag: ${v.car_tag}`].filter(Boolean).join(' · ') || 'No sticker/tag'}
+                      </p>
+                    </div>
+                    {v.is_primary && (
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 flex-shrink-0">Primary</span>
+                    )}
+                    {selectedVehiclePlate === v.car_plate_number && (
+                      <svg className="w-4 h-4 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* No vehicles warning */}
+          {form.employee_id && selectedEmployeeVehicles.length === 0 && (
+            <Alert type="warning" message="This employee has no registered vehicles. Add a vehicle to their profile first." />
+          )}
           <div className="grid grid-cols-2 gap-4">
-            <TextInput label="Car Plate Number" required value={form.car_plate_number} onChange={e => setForm(f => ({ ...f, car_plate_number: e.target.value }))} placeholder="ABC-1234" />
+            <TextInput
+              label="Car Plate Number"
+              required
+              value={form.car_plate_number}
+              onChange={e => setForm(f => ({ ...f, car_plate_number: e.target.value }))}
+              placeholder="ABC-1234"
+              hint="Auto-filled from selected vehicle"
+            />
             <SelectInput label="Parking Type" required value={form.parking_type} onChange={e => setForm(f => ({ ...f, parking_type: e.target.value }))}>
               <option value="ASSIGNED">Assigned</option>
               <option value="POOL">Pool</option>
@@ -211,6 +353,87 @@ export default function ParkingRecords() {
             <button type="button" onClick={() => setModal(null)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
             <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
               {submitting ? 'Assigning...' : 'Assign Parking'}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Edit Modal */}
+      <Modal isOpen={modal === 'edit'} onClose={() => setModal(null)} title="Edit Parking Record" size="large">
+        <form onSubmit={handleUpdate} className="space-y-5">
+          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+
+          {/* Read-only summary */}
+          <div className="rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 grid grid-cols-2 gap-3 text-[13px]">
+            <div>
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Employee</p>
+              <p className="font-semibold text-slate-800 mt-0.5">{editing?.employee_id?.full_name || '—'}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Car Plate</p>
+              <p className="font-mono font-semibold text-slate-800 mt-0.5">{editing?.car_plate_number || '—'}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Type</p>
+              <p className="mt-0.5"><StatusBadge status={editing?.parking_type} /></p>
+            </div>
+            <div>
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Company</p>
+              <p className="font-medium text-slate-700 mt-0.5">{editing?.tenant_id?.company_name || '—'}</p>
+            </div>
+          </div>
+
+          {/* Editable fields */}
+          <div className="grid grid-cols-3 gap-4">
+            <TextInput
+              label="Badge ID"
+              type="number"
+              value={editing?.editBadgeId ?? editing?.badge_id ?? ''}
+              onChange={e => setEditing(v => ({ ...v, editBadgeId: e.target.value }))}
+              placeholder={editing?.badge_id || 'e.g. 1001'}
+            />
+            <TextInput
+              label="Sticker Number"
+              value={editing?.editStickerNumber ?? editing?.sticker_number ?? ''}
+              onChange={e => setEditing(v => ({ ...v, editStickerNumber: e.target.value }))}
+              placeholder={editing?.sticker_number || 'STK-001'}
+            />
+            <TextInput
+              label="SR Number"
+              value={editing?.editSrNumber ?? editing?.sr_number ?? ''}
+              onChange={e => setEditing(v => ({ ...v, editSrNumber: e.target.value }))}
+              placeholder={editing?.sr_number || 'SR-001'}
+            />
+          </div>
+
+          {editing?.parking_type === 'ASSIGNED' && (
+            <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-blue-50 border border-blue-100">
+              <TextInput
+                label="Slot Code"
+                value={editing?.editSlotCode ?? editing?.assigned_slot?.slot_code ?? ''}
+                onChange={e => setEditing(v => ({ ...v, editSlotCode: e.target.value }))}
+                placeholder={editing?.assigned_slot?.slot_code || 'A-01'}
+              />
+              <TextInput
+                label="Floor Number"
+                value={editing?.editFloorNumber ?? editing?.assigned_slot?.floor_number ?? ''}
+                onChange={e => setEditing(v => ({ ...v, editFloorNumber: e.target.value }))}
+                placeholder={editing?.assigned_slot?.floor_number || '1'}
+              />
+            </div>
+          )}
+
+          <TextareaInput
+            label="Remarks"
+            value={editing?.editRemarks ?? editing?.remarks ?? ''}
+            onChange={e => setEditing(v => ({ ...v, editRemarks: e.target.value }))}
+            placeholder="Optional notes..."
+          />
+
+          <div className="flex justify-end gap-3 pt-2">
+            <button type="button" onClick={() => setModal(null)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+            <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+              {submitting ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>

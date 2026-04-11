@@ -358,9 +358,56 @@ const cancelParkingRecord = asyncHandler(async (req, res) => {
         );
 });
 
+const updateParkingRecord = asyncHandler(async (req, res) => {
+    const record = await ParkingRecord.findById(req.params.id);
+
+    if (!record) {
+        throw new ApiError(404, "Parking record not found");
+    }
+    if (record.status === "CANCELLED") {
+        throw new ApiError(400, "Cannot update a cancelled parking record");
+    }
+
+    const { badge_id, sticker_number, car_tag, sr_number, assigned_slot, remarks } = req.body;
+
+    if (badge_id       !== undefined) record.badge_id       = badge_id       || null;
+    if (sticker_number !== undefined) record.sticker_number = sticker_number || null;
+    if (car_tag        !== undefined) record.car_tag        = car_tag        || null;
+    if (sr_number      !== undefined) record.sr_number      = sr_number      || null;
+    if (remarks        !== undefined) record.remarks        = remarks        || null;
+
+    // Only allow slot update for ASSIGNED type
+    if (assigned_slot && record.parking_type === "ASSIGNED") {
+        if (assigned_slot.slot_code) {
+            // Check the new slot isn't taken by another active record
+            const slotTaken = await ParkingRecord.findOne({
+                "assigned_slot.slot_code": assigned_slot.slot_code,
+                status: "ACTIVE",
+                _id: { $ne: record._id },
+            });
+            if (slotTaken) {
+                throw new ApiError(409, `Slot ${assigned_slot.slot_code} is already occupied by another active record`);
+            }
+            record.assigned_slot.slot_code = assigned_slot.slot_code;
+        }
+        if (assigned_slot.floor_number) {
+            record.assigned_slot.floor_number = assigned_slot.floor_number;
+        }
+    }
+
+    await record.save();
+
+    const updated = await getFullParkingRecord(record._id);
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, "Parking record updated successfully", updated));
+});
+
 export {
     createParkingRecord,
     getAllParkingRecords,
     getParkingRecordById,
     cancelParkingRecord,
+    updateParkingRecord,
 };

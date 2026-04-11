@@ -34,6 +34,7 @@ export const fetchParkingRecords = (query) => http.get('/admin/parking', { query
 export const fetchParkingRecordById = (id) => http.get(`/admin/parking/${id}`);
 export const createParkingRecord = (payload) => http.post('/admin/parking', payload);
 export const cancelParkingRecord = (id, payload) => http.patch(`/admin/parking/${id}/cancel`, payload);
+export const updateParkingRecord = (id, payload) => http.patch(`/admin/parking/${id}`, payload);
 
 // Rental Contracts
 export const fetchRentalContracts = (query) => http.get('/admin/rental-contracts', { query });
