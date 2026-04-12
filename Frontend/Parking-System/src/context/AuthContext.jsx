@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as authApi from '../services/authApi.js';
 
 const AuthContext = createContext(null);
@@ -10,30 +10,27 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
     authApi.me()
-      .then(res => {
-        if (!cancelled) setAdmin(res?.data || null);
-      })
+      .then(res => { if (!cancelled) setAdmin(res?.message || null); })
       .catch(() => { if (!cancelled) setAdmin(null); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, []);
 
-  const login = async (credentials) => {
+  const login = useCallback(async (credentials) => {
     const res = await authApi.login(credentials);
-    // ApiResponse: { statusCode, data: { accessToken, refreshToken, loggedInAdmin }, message }
-    const adminData = res?.data?.loggedInAdmin ?? null;
+    const adminData = res?.message?.loggedInAdmin ?? null;
     setAdmin(adminData);
-    return res;
-  };
+    return adminData; // return the admin object so caller can navigate immediately
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try { await authApi.logout(); } catch { /* best-effort */ }
     setAdmin(null);
-  };
+  }, []);
 
   const value = useMemo(
     () => ({ admin, loading, login, logout }),
-    [admin, loading] // login/logout are stable — defined in render scope but don't change
+    [admin, loading, login, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

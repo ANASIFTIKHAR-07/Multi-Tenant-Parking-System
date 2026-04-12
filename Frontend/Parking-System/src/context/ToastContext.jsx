@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useReducer } from 'react';
+import { createContext, useCallback, useContext, useReducer, useMemo } from 'react';
 
 const ToastContext = createContext(null);
 
@@ -28,14 +28,21 @@ export function ToastProvider({ children }) {
     return id;
   }, []);
 
-  // Convenience methods
-  toast.success = (title, message, opts) => toast({ type: 'success', title, message, ...opts });
-  toast.error   = (title, message, opts) => toast({ type: 'error',   title, message, ...opts });
-  toast.warning = (title, message, opts) => toast({ type: 'warning', title, message, ...opts });
-  toast.info    = (title, message, opts) => toast({ type: 'info',    title, message, ...opts });
+  const value = useMemo(() => {
+    const wrappedToast = Object.assign(
+      (opts) => toast(opts),
+      {
+        success: (title, message, opts) => toast({ type: 'success', title, message, ...opts }),
+        error:   (title, message, opts) => toast({ type: 'error',   title, message, ...opts }),
+        warning: (title, message, opts) => toast({ type: 'warning', title, message, ...opts }),
+        info:    (title, message, opts) => toast({ type: 'info',    title, message, ...opts }),
+      }
+    );
+    return { toast: wrappedToast, dismiss, toasts };
+  }, [toast, dismiss, toasts]);
 
   return (
-    <ToastContext.Provider value={{ toast, dismiss, toasts }}>
+    <ToastContext.Provider value={value}>
       {children}
     </ToastContext.Provider>
   );

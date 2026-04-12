@@ -15,16 +15,16 @@ const Input = ({
   className = '',
   ...props
 }) => {
-  const baseInput = 'w-full bg-white shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:bg-gray-100 transition-all duration-200';
+  const baseInput = 'w-full bg-white dark:bg-slate-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:bg-gray-100 transition-all duration-200';
   
   const variants = {
     // Original variant
     default: 'rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500',
     
     // New theme variants
-    glass: 'rounded-xl border border-white border-opacity-30 bg-white bg-opacity-90 backdrop-blur-sm focus:ring-blue-500 focus:border-blue-500 focus:bg-opacity-100',
+    glass: 'rounded-xl border border-white border-opacity-30 bg-white dark:bg-slate-900 bg-opacity-90 backdrop-blur-sm focus:ring-blue-500 focus:border-blue-500 focus:bg-opacity-100',
     glassDark: 'rounded-xl border border-gray-600 border-opacity-40 bg-gray-900 bg-opacity-20 backdrop-blur-sm text-white placeholder:text-gray-300 focus:ring-purple-500 focus:border-purple-500',
-    soft: 'rounded-xl border-2 border-blue-100 bg-blue-50 focus:ring-blue-500 focus:border-blue-300 focus:bg-white',
+    soft: 'rounded-xl border-2 border-blue-100 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 focus:ring-blue-500 focus:border-blue-300 focus:bg-white dark:bg-slate-900',
     premium: 'rounded-2xl border-2 border-transparent bg-gradient-to-r from-blue-50 to-purple-50 focus:ring-purple-500 focus:from-white focus:to-white shadow-lg',
     outline: 'rounded-lg border-2 border-gray-200 bg-transparent focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300'
   };
@@ -39,7 +39,7 @@ const Input = ({
     default: 'text-gray-700',
     glass: 'text-white font-medium',
     glassDark: 'text-gray-200 font-medium',
-    soft: 'text-blue-700 font-medium',
+    soft: 'text-blue-700 dark:text-blue-400 font-medium',
     premium: 'text-gray-700 font-semibold',
     outline: 'text-gray-700'
   };
@@ -86,7 +86,7 @@ const Input = ({
           <svg className="w-4 h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span className="text-sm text-red-600">{error}</span>
+          <span className="text-sm text-red-600 dark:text-red-400">{error}</span>
         </div>
       )}
     </div>

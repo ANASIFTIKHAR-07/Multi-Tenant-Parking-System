@@ -65,23 +65,23 @@ export default function RentalContracts() {
   };
 
   const columns = [
-    { key: 'contract_ref_number', label: 'Ref #', render: r => <span className="font-mono text-sm font-semibold text-slate-800">{r.contract_ref_number}</span> },
-    { key: 'company_name', label: 'Company', render: r => <span className="text-sm text-slate-700">{r.company_name}</span> },
-    { key: 'tenant', label: 'Tenant', render: r => <span className="text-xs text-slate-500">{r.tenant_id?.company_name || '—'}</span> },
+    { key: 'contract_ref_number', label: 'Ref #', render: r => <span className="font-mono text-sm font-semibold text-slate-800 dark:text-slate-200">{r.contract_ref_number}</span> },
+    { key: 'company_name', label: 'Company', render: r => <span className="text-sm text-slate-700 dark:text-slate-300">{r.company_name}</span> },
+    { key: 'tenant', label: 'Tenant', render: r => <span className="text-xs text-slate-500 dark:text-slate-400">{r.tenant_id?.company_name || '—'}</span> },
     { key: 'slots', label: 'Slots', render: r => (
       <div className="text-xs">
-        <span className="font-semibold text-slate-700">{r.slots_used}</span>
-        <span className="text-slate-400"> / {r.slots_allocated}</span>
-        <span className="text-slate-400"> used</span>
+        <span className="font-semibold text-slate-700 dark:text-slate-300">{r.slots_used}</span>
+        <span className="text-slate-400 dark:text-slate-500"> / {r.slots_allocated}</span>
+        <span className="text-slate-400 dark:text-slate-500"> used</span>
       </div>
     )},
-    { key: 'duration', label: 'Duration', render: r => <span className="text-xs text-slate-600">{r.duration_months} months</span> },
+    { key: 'duration', label: 'Duration', render: r => <span className="text-xs text-slate-600 dark:text-slate-400">{r.duration_months} months</span> },
     { key: 'end_date', label: 'Expires', render: r => {
       const days = r.days_until_expiry ?? Math.ceil((new Date(r.end_date) - new Date()) / 86400000);
       return (
         <div>
-          <p className="text-xs text-slate-600">{new Date(r.end_date).toLocaleDateString()}</p>
-          <p className={`text-xs font-medium ${days < 0 ? 'text-red-500' : days < 30 ? 'text-amber-500' : 'text-slate-400'}`}>
+          <p className="text-xs text-slate-600 dark:text-slate-400">{new Date(r.end_date).toLocaleDateString()}</p>
+          <p className={`text-xs font-medium ${days < 0 ? 'text-red-500' : days < 30 ? 'text-amber-500' : 'text-slate-400 dark:text-slate-500'}`}>
             {days < 0 ? `${Math.abs(days)}d overdue` : `${days}d left`}
           </p>
         </div>
@@ -90,8 +90,8 @@ export default function RentalContracts() {
     { key: 'status', label: 'Status', render: r => <StatusBadge status={r.status} /> },
     { key: 'actions', label: '', render: r => (
       <div className="flex items-center gap-1.5 justify-end">
-        {r.status !== 'CANCELLED' && <button onClick={() => openEdit(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">Edit</button>}
-        <button onClick={() => handleDelete(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors">Delete</button>
+        {r.status !== 'CANCELLED' && <button onClick={() => openEdit(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors">Edit</button>}
+        <button onClick={() => handleDelete(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 transition-colors">Delete</button>
       </div>
     )},
   ];
@@ -111,19 +111,19 @@ export default function RentalContracts() {
       />
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-wrap gap-3 items-end">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-4 flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[180px]">
-          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Company</label>
+          <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Company</label>
           <select value={filters.tenant_id} onChange={e => { setFilters(f => ({ ...f, tenant_id: e.target.value })); setPage(1); }}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white">
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white dark:bg-slate-900">
             <option value="">All Companies</option>
             {tenants.map(t => <option key={t._id} value={t._id}>{t.company_name}</option>)}
           </select>
         </div>
         <div className="flex-1 min-w-[140px]">
-          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Status</label>
+          <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Status</label>
           <select value={filters.status} onChange={e => { setFilters(f => ({ ...f, status: e.target.value })); setPage(1); }}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white">
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white dark:bg-slate-900">
             <option value="">All</option>
             <option value="ACTIVE">Active</option>
             <option value="EXPIRED">Expired</option>
@@ -131,10 +131,10 @@ export default function RentalContracts() {
             <option value="CANCELLED">Cancelled</option>
           </select>
         </div>
-        <button onClick={() => { setFilters({ tenant_id: '', status: '' }); setPage(1); }} className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">Clear</button>
+        <button onClick={() => { setFilters({ tenant_id: '', status: '' }); setPage(1); }} className="px-4 py-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors">Clear</button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
         <DataTable columns={columns} data={contracts} loading={loading} emptyMessage="No rental contracts found" />
         <Pagination pagination={pagination} onPageChange={setPage} />
       </div>
@@ -147,19 +147,19 @@ export default function RentalContracts() {
             <option value="">Select tenant</option>
             {tenants.map(t => <option key={t._id} value={t._id}>{t.company_name}</option>)}
           </SelectInput>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <TextInput label="Contract Ref Number" required value={form.contract_ref_number} onChange={e => setForm(f => ({ ...f, contract_ref_number: e.target.value }))} placeholder="RC-2024-001" />
             <TextInput label="Company Name" required value={form.company_name} onChange={e => setForm(f => ({ ...f, company_name: e.target.value }))} placeholder="Company name on contract" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <TextInput label="Floor" value={form.floor} onChange={e => setForm(f => ({ ...f, floor: e.target.value }))} placeholder="e.g. 3" />
             <TextInput label="Unit" value={form.unit} onChange={e => setForm(f => ({ ...f, unit: e.target.value }))} placeholder="e.g. 301" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <TextInput label="Slots Allocated" required type="number" min="1" value={form.slots_allocated} onChange={e => setForm(f => ({ ...f, slots_allocated: e.target.value }))} placeholder="5" />
             <TextInput label="Duration (months)" required type="number" min="1" value={form.duration_months} onChange={e => setForm(f => ({ ...f, duration_months: e.target.value }))} placeholder="12" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <TextInput label="Start Date" required type="date" value={form.start_date} onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))} />
             <TextInput label="End Date" required type="date" value={form.end_date} onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))} />
           </div>
@@ -173,7 +173,7 @@ export default function RentalContracts() {
           )}
           <TextareaInput label="Remarks" value={form.remarks} onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))} placeholder="Optional notes..." />
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setModal(null)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+            <button type="button" onClick={() => setModal(null)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors">Cancel</button>
             <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
               {submitting ? 'Saving...' : editing ? 'Update Contract' : 'Create Contract'}
             </button>

@@ -7,7 +7,7 @@ import { useToast } from '../../context/ToastContext.jsx';
 function PasswordInput({ id, label, value, show, onToggle, onChange, placeholder, autoComplete }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+      <label htmlFor={id} className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
         {label}
       </label>
       <div className="relative">
@@ -19,11 +19,11 @@ function PasswordInput({ id, label, value, show, onToggle, onChange, placeholder
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-slate-200 bg-white text-[13.5px] text-slate-900 placeholder-slate-400 outline-none transition-all hover:border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+          className="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900 text-[13.5px] text-slate-900 dark:text-white placeholder-slate-400 outline-none transition-all hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
         />
         <button
           type="button" tabIndex={-1} onClick={onToggle}
-          className="absolute inset-y-0 right-0 w-10 flex items-center justify-center text-slate-300 hover:text-slate-500 transition-colors"
+          className="absolute inset-y-0 right-0 w-10 flex items-center justify-center text-slate-300 hover:text-slate-500 dark:text-slate-400 transition-colors"
         >
           {show ? (
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,7 +55,7 @@ const STRENGTH_META = [
   { label: 'Weak',   bar: 'bg-red-400',    text: 'text-red-500'    },
   { label: 'Fair',   bar: 'bg-orange-400', text: 'text-orange-500' },
   { label: 'Good',   bar: 'bg-yellow-400', text: 'text-yellow-600' },
-  { label: 'Strong', bar: 'bg-emerald-500',text: 'text-emerald-600'},
+  { label: 'Strong', bar: 'bg-emerald-500',text: 'text-emerald-600 dark:text-emerald-400'},
 ];
 
 export default function Profile() {
@@ -109,15 +109,15 @@ export default function Profile() {
     <div className="pb-8">
       {/* Page header */}
       <div className="mb-7">
-        <h1 className="text-[20px] font-bold text-slate-900">Account Profile</h1>
-        <p className="text-[13px] text-slate-400 mt-1">Manage your personal information and account security</p>
+        <h1 className="text-[20px] font-bold text-slate-900 dark:text-white">Account Profile</h1>
+        <p className="text-[13px] text-slate-400 dark:text-slate-500 mt-1">Manage your personal information and account security</p>
       </div>
 
       {/* Two-column grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
 
         {/* ── LEFT: Identity card ── */}
-        <div className="bg-white rounded-2xl border border-slate-200/70 shadow-sm h-full flex flex-col">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 shadow-sm h-full flex flex-col">
           {/* Banner — overflow-hidden only on the banner, not the card */}
           <div className="h-24 rounded-t-2xl overflow-hidden relative"
             style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #1e4080 50%, #163366 100%)' }}
@@ -149,28 +149,28 @@ export default function Profile() {
 
             {/* Name / email / badge */}
             <div className="mb-5">
-              <p className="text-[17px] font-bold text-slate-900">{admin?.name || 'Admin'}</p>
-              <p className="text-[13px] text-slate-400 mt-0.5">{admin?.email}</p>
-              <span className="inline-flex items-center gap-1.5 mt-2.5 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200/60 text-[11px] font-semibold text-blue-700 tracking-wide">
+              <p className="text-[17px] font-bold text-slate-900 dark:text-white">{admin?.name || 'Admin'}</p>
+              <p className="text-[13px] text-slate-400 dark:text-slate-500 mt-0.5">{admin?.email}</p>
+              <span className="inline-flex items-center gap-1.5 mt-2.5 px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-200/60 text-[11px] font-semibold text-blue-700 dark:text-blue-400 tracking-wide">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                 {(admin?.role || 'ADMIN').toUpperCase()}
               </span>
             </div>
 
-            <div className="h-px bg-slate-100 mb-4" />
+            <div className="h-px bg-slate-100 dark:bg-slate-800 mb-4" />
 
             {/* Info rows */}
             <div className="space-y-0.5 flex-1">
               {infoRows.map(({ label, value, icon, mono }) => (
-                <div key={label} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-colors group">
-                  <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div key={label} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 dark:bg-slate-800/40 transition-colors group">
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200/60 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d={icon} />
                     </svg>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{label}</p>
-                    <p className={`text-[13px] font-medium text-slate-800 truncate mt-0.5 ${mono ? 'font-mono' : ''}`}>{value}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{label}</p>
+                    <p className={`text-[13px] font-medium text-slate-800 dark:text-slate-200 truncate mt-0.5 ${mono ? 'font-mono' : ''}`}>{value}</p>
                   </div>
                 </div>
               ))}
@@ -179,16 +179,16 @@ export default function Profile() {
         </div>
 
         {/* ── RIGHT: Change password ── */}
-        <div className="bg-white rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden h-full flex flex-col">
-          <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden h-full flex flex-col">
+          <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
             <div>
-              <p className="text-[14px] font-bold text-slate-800">Change Password</p>
-              <p className="text-[12px] text-slate-400 mt-0.5">Keep your account secure with a strong password</p>
+              <p className="text-[14px] font-bold text-slate-800 dark:text-slate-200">Change Password</p>
+              <p className="text-[12px] text-slate-400 dark:text-slate-500 mt-0.5">Keep your account secure with a strong password</p>
             </div>
           </div>
 
@@ -218,10 +218,10 @@ export default function Profile() {
               <div className="space-y-1.5">
                 <div className="flex gap-1">
                   {[1, 2, 3, 4].map(i => (
-                    <div key={i} className={`h-[3px] flex-1 rounded-full transition-all duration-300 ${i <= strength ? meta?.bar : 'bg-slate-100'}`} />
+                    <div key={i} className={`h-[3px] flex-1 rounded-full transition-all duration-300 ${i <= strength ? meta?.bar : 'bg-slate-100 dark:bg-slate-800'}`} />
                   ))}
                 </div>
-                <p className="text-[11.5px] text-slate-400">
+                <p className="text-[11.5px] text-slate-400 dark:text-slate-500">
                   Strength: <span className={`font-semibold ${meta?.text}`}>{meta?.label}</span>
                   <span className="ml-2 text-slate-300">· Use uppercase, numbers &amp; symbols</span>
                 </p>
@@ -239,7 +239,7 @@ export default function Profile() {
 
             {/* Match indicator */}
             {form.confirmPassword && (
-              <p className={`text-[12px] font-medium flex items-center gap-1.5 ${form.newPassword === form.confirmPassword ? 'text-emerald-600' : 'text-red-500'}`}>
+              <p className={`text-[12px] font-medium flex items-center gap-1.5 ${form.newPassword === form.confirmPassword ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'}`}>
                 {form.newPassword === form.confirmPassword ? (
                   <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>Passwords match</>
                 ) : (
@@ -249,8 +249,8 @@ export default function Profile() {
             )}
 
             {/* Requirements checklist */}
-            <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3.5 space-y-2">
-              <p className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">Password requirements</p>
+            <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 px-4 py-3.5 space-y-2">
+              <p className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2.5">Password requirements</p>
               {requirements.map(({ label, met }) => (
                 <div key={label} className="flex items-center gap-2.5">
                   <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-200 ${met ? 'bg-emerald-500' : 'bg-slate-200'}`}>
@@ -260,7 +260,7 @@ export default function Profile() {
                       </svg>
                     )}
                   </div>
-                  <span className={`text-[12.5px] transition-colors duration-200 ${met ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>{label}</span>
+                  <span className={`text-[12.5px] transition-colors duration-200 ${met ? 'text-slate-700 dark:text-slate-300 font-medium' : 'text-slate-400 dark:text-slate-500'}`}>{label}</span>
                 </div>
               ))}
             </div>

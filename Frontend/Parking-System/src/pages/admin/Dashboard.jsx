@@ -72,7 +72,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-6 gap-3">
         <StatCard label="Tenants"        value={loading ? '…' : stats.tenants}              color="blue"   icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>} />
         <StatCard label="Employees"      value={loading ? '…' : stats.employees}            color="purple" icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>} />
         <StatCard label="Active Parking" value={loading ? '…' : stats.activeParkingRecords} color="green"  icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>} />
@@ -83,27 +83,27 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
         {/* Recent tenants */}
-        <div className="xl:col-span-2 bg-white rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-            <p className="text-[13px] font-semibold text-slate-800">Recent Tenants</p>
-            <Link to="/admin/tenants" className="text-[12px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">View all →</Link>
+        <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+            <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200">Recent Tenants</p>
+            <Link to="/admin/tenants" className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:text-blue-400 transition-colors">View all →</Link>
           </div>
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-6 h-6 border-2 border-blue-100 border-t-blue-600 rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-blue-100 dark:border-blue-500/20 border-t-blue-600 rounded-full animate-spin" />
             </div>
           ) : recentTenants.length === 0 ? (
-            <p className="text-center text-[13px] text-slate-400 py-12">No tenants yet</p>
+            <p className="text-center text-[13px] text-slate-400 dark:text-slate-500 py-12">No tenants yet</p>
           ) : (
             <div className="divide-y divide-slate-50">
               {recentTenants.map(t => (
-                <div key={t._id} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50/60 transition-colors">
+                <div key={t._id} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50/60 dark:bg-slate-800/60 transition-colors">
                   <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-sm">
                     <span className="text-white text-[11px] font-bold">{t.company_name?.charAt(0)}</span>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-semibold text-slate-800 truncate">{t.company_name}</p>
-                    <p className="text-[11px] text-slate-400 truncate">Floor {t.unit_id?.floor} · Unit {t.unit_id?.unit_number}</p>
+                    <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 truncate">{t.company_name}</p>
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">Floor {t.unit_id?.floor} · Unit {t.unit_id?.unit_number}</p>
                   </div>
                   <StatusBadge status={t.status} />
                 </div>
@@ -113,20 +113,20 @@ export default function Dashboard() {
         </div>
 
         {/* Quick actions */}
-        <div className="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-5">
-          <p className="text-[13px] font-semibold text-slate-800 mb-4">Quick Actions</p>
-          <div className="grid grid-cols-2 xl:grid-cols-1 gap-2">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 shadow-sm p-5">
+          <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 mb-4">Quick Actions</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2">
             {QUICK_ACTIONS.map(a => (
               <Link
                 key={a.to}
                 to={a.to}
-                className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50/60 transition-all group"
+                className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:border-slate-700/80 hover:bg-slate-50/60 dark:bg-slate-800/60 transition-all group"
               >
                 <div className={`w-7 h-7 rounded-lg ${a.color} flex items-center justify-center flex-shrink-0 shadow-sm`}>
                   <span className="text-white [&>svg]:w-3.5 [&>svg]:h-3.5">{a.icon}</span>
                 </div>
-                <span className="text-[12px] font-semibold text-slate-600 group-hover:text-slate-800 transition-colors truncate">{a.label}</span>
-                <svg className="w-3.5 h-3.5 text-slate-300 ml-auto flex-shrink-0 group-hover:text-slate-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span className="text-[12px] font-semibold text-slate-600 dark:text-slate-400 group-hover:text-slate-800 dark:text-slate-200 transition-colors truncate">{a.label}</span>
+                <svg className="w-3.5 h-3.5 text-slate-300 ml-auto flex-shrink-0 group-hover:text-slate-400 dark:text-slate-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -137,28 +137,28 @@ export default function Dashboard() {
 
       {/* Active parking table */}
       {recentParking.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-            <p className="text-[13px] font-semibold text-slate-800">Active Parking Records</p>
-            <Link to="/admin/parking" className="text-[12px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">View all →</Link>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+            <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200">Active Parking Records</p>
+            <Link to="/admin/parking" className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:text-blue-400 transition-colors">View all →</Link>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/60">
+                <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/60">
                   {['Employee', 'Company', 'Plate', 'Type', 'Slot'].map(h => (
-                    <th key={h} className="px-5 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-5 py-3 text-left text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {recentParking.map(r => (
-                  <tr key={r._id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="px-5 py-3.5 text-[13px] font-medium text-slate-800 whitespace-nowrap">{r.employee_id?.full_name || '—'}</td>
-                    <td className="px-5 py-3.5 text-[13px] text-slate-500 whitespace-nowrap">{r.tenant_id?.company_name || '—'}</td>
-                    <td className="px-5 py-3.5 text-[13px] font-mono font-semibold text-slate-700 whitespace-nowrap">{r.car_plate_number}</td>
+                  <tr key={r._id} className="hover:bg-slate-50/60 dark:bg-slate-800/60 transition-colors">
+                    <td className="px-5 py-3.5 text-[13px] font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">{r.employee_id?.full_name || '—'}</td>
+                    <td className="px-5 py-3.5 text-[13px] text-slate-500 dark:text-slate-400 whitespace-nowrap">{r.tenant_id?.company_name || '—'}</td>
+                    <td className="px-5 py-3.5 text-[13px] font-mono font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">{r.car_plate_number}</td>
                     <td className="px-5 py-3.5 whitespace-nowrap"><StatusBadge status={r.parking_type} /></td>
-                    <td className="px-5 py-3.5 text-[12px] font-mono text-slate-500 whitespace-nowrap">{r.assigned_slot?.slot_code || '—'}</td>
+                    <td className="px-5 py-3.5 text-[12px] font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap">{r.assigned_slot?.slot_code || '—'}</td>
                   </tr>
                 ))}
               </tbody>

@@ -44,7 +44,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'medium
       {/* Panel */}
       <div
         className={`
-          relative w-full bg-white shadow-2xl z-10 flex flex-col
+          relative w-full bg-white dark:bg-slate-900 shadow-2xl z-10 flex flex-col
           rounded-t-2xl sm:rounded-2xl
           max-h-[92vh] sm:max-h-[85vh]
           ${SIZES[size] || SIZES.medium}
@@ -58,12 +58,12 @@ export default function Modal({ isOpen, onClose, title, children, size = 'medium
 
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 flex-shrink-0">
-            <h2 id="modal-title" className="text-[15px] font-semibold text-slate-900">{title}</h2>
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex-shrink-0">
+            <h2 id="modal-title" className="text-[15px] font-semibold text-slate-900 dark:text-white">{title}</h2>
             <button
               onClick={onClose}
               aria-label="Close dialog"
-              className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

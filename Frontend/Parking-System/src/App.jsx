@@ -1,5 +1,6 @@
-import './index.css';
+
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import ToastContainer from './Components/common/ToastContainer.jsx';
@@ -19,9 +20,10 @@ import Profile from './pages/admin/Profile.jsx';
 
 function App() {
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <BrowserRouter>
+    <ThemeProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
@@ -43,9 +45,10 @@ function App() {
             <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
           </Routes>
         </BrowserRouter>
-        <ToastContainer />
-      </AuthProvider>
-    </ToastProvider>
+          <ToastContainer />
+        </AuthProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 

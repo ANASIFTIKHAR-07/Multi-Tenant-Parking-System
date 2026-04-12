@@ -10,12 +10,12 @@ export default function PageHeader({ title, subtitle, actions, icon }) {
           </div>
         )}
         <div className="min-w-0">
-          <h1 className="text-[18px] font-bold text-slate-900 leading-tight truncate">{title}</h1>
-          {subtitle && <p className="text-[12px] text-slate-400 mt-0.5 truncate">{subtitle}</p>}
+          <h1 className="text-[18px] font-bold text-slate-900 dark:text-white leading-tight truncate">{title}</h1>
+          {subtitle && <p className="text-[12px] text-slate-400 dark:text-slate-500 mt-0.5 truncate">{subtitle}</p>}
         </div>
       </div>
       {actions && (
-        <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
+        <div className="flex items-center gap-2 flex-shrink-0 flex-wrap w-full sm:w-auto [&>*]:w-full sm:[&>*]:w-auto mt-2 sm:mt-0">
           {actions}
         </div>
       )}

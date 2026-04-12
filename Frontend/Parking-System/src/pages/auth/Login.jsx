@@ -9,11 +9,13 @@ export default function Login() {
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, loading, admin } = useAuth();
+  const { login, admin, loading } = useAuth();
 
   useEffect(() => {
-    if (admin) navigate(location.state?.from?.pathname || '/admin/dashboard', { replace: true });
-  }, [admin]);
+    if (!loading && admin) {
+      navigate('/admin/dashboard', { replace: true });
+    }
+  }, [admin, loading, navigate]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -21,7 +23,10 @@ export default function Login() {
     setError('');
     setSubmitting(true);
     try {
-      await login(form);
+      const adminData = await login(form);
+      if (adminData) {
+        navigate(location.state?.from?.pathname || '/admin/dashboard', { replace: true });
+      }
     } catch (e) {
       console.error('[Login] error:', e);
       setError(e.message || 'Invalid credentials');
@@ -31,13 +36,13 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F6FA] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#F4F6FA] dark:bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-200">
       {/* Subtle background grid */}
-      <div className="absolute inset-0 bg-grid opacity-60 pointer-events-none" />
+      <div className="absolute inset-0 bg-grid opacity-60 dark:opacity-20 pointer-events-none" />
 
       {/* Soft glow blobs */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-100 rounded-full opacity-30 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-indigo-100 rounded-full opacity-25 blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-100 dark:bg-blue-900/40 rounded-full opacity-30 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-indigo-100 dark:bg-indigo-900/40 rounded-full opacity-25 blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-[400px] relative">
         {/* Brand mark */}
@@ -47,26 +52,26 @@ export default function Login() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
             </svg>
           </div>
-          <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">ParkAdmin</h1>
-          <p className="text-[13px] text-slate-400 mt-1">Sign in to your management console</p>
+          <h1 className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">ParkAdmin</h1>
+          <p className="text-[13px] text-slate-400 dark:text-slate-500 mt-1">Sign in to your management console</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-200/80 overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-200/80 overflow-hidden">
           <div className="px-6 pt-6 pb-5">
             {error && (
-              <div className="mb-5 flex items-start gap-2.5 px-3.5 py-3 rounded-xl bg-red-50 border border-red-200">
+              <div className="mb-5 flex items-start gap-2.5 px-3.5 py-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200">
                 <svg className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
-                <p className="text-[13px] text-red-700 font-medium">{error}</p>
+                <p className="text-[13px] text-red-700 dark:text-red-400 font-medium">{error}</p>
               </div>
             )}
 
             <form onSubmit={onSubmit} className="space-y-4">
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-[12px] font-semibold text-slate-600 mb-1.5">
+                <label htmlFor="email" className="block text-[12px] font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
                   Email Address
                 </label>
                 <div className="relative">
@@ -80,14 +85,14 @@ export default function Login() {
                     value={form.email}
                     onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                     placeholder="admin@example.com"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-[13px] text-slate-900 placeholder-slate-400 bg-slate-50/50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all hover:border-slate-300"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 text-[13px] text-slate-900 dark:text-white placeholder-slate-400 bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:bg-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700"
                   />
                 </div>
               </div>
 
               {/* Password */}
               <div>
-                <label htmlFor="password" className="block text-[12px] font-semibold text-slate-600 mb-1.5">
+                <label htmlFor="password" className="block text-[12px] font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
                   Password
                 </label>
                 <div className="relative">
@@ -102,12 +107,12 @@ export default function Login() {
                     value={form.password}
                     onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-[13px] text-slate-900 placeholder-slate-400 bg-slate-50/50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all hover:border-slate-300"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 text-[13px] text-slate-900 dark:text-white placeholder-slate-400 bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:bg-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPass(!showPass)}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-300 hover:text-slate-500 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-300 hover:text-slate-500 dark:text-slate-400 transition-colors"
                     tabIndex={-1}
                   >
                     {showPass ? (
@@ -135,25 +140,25 @@ export default function Login() {
           </div>
 
           {/* Footer strip */}
-          <div className="px-6 py-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-center gap-5">
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+          <div className="px-6 py-3.5 bg-slate-50/80 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 flex items-center justify-center gap-5">
+            <div className="flex items-center gap-1.5 text-[11px] text-slate-400 dark:text-slate-500">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               Secure Connection
             </div>
             <div className="w-px h-3 bg-slate-200" />
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+            <div className="flex items-center gap-1.5 text-[11px] text-slate-400 dark:text-slate-500">
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>
               JWT Auth
             </div>
             <div className="w-px h-3 bg-slate-200" />
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+            <div className="flex items-center gap-1.5 text-[11px] text-slate-400 dark:text-slate-500">
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
               Rate Limited
             </div>
           </div>
         </div>
 
-        <p className="text-center text-[11px] text-slate-400 mt-5">
+        <p className="text-center text-[11px] text-slate-400 dark:text-slate-500 mt-5">
           ParkAdmin · Enterprise Parking Management
         </p>
       </div>

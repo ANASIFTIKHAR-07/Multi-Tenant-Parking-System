@@ -5,14 +5,14 @@ import Alert from '../../Components/common/Alert.jsx';
 
 const FilterField = ({ field, value, onChange }) => (
   <div className="flex flex-col gap-1.5">
-    <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+    <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
       {field.label}
     </label>
     {field.type === 'select' ? (
       <select
         value={value || ''}
         onChange={e => onChange(e.target.value)}
-        className="w-full px-3 py-2 rounded-xl border border-slate-200 text-[13px] text-slate-800 outline-none bg-white hover:border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all"
+        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-[13px] text-slate-800 dark:text-slate-200 outline-none bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all"
       >
         <option value="">All</option>
         {field.options.map(o => (
@@ -25,7 +25,7 @@ const FilterField = ({ field, value, onChange }) => (
         value={value || ''}
         onChange={e => onChange(e.target.value)}
         placeholder={field.placeholder}
-        className="w-full px-3 py-2 rounded-xl border border-slate-200 text-[13px] text-slate-800 placeholder-slate-400 outline-none hover:border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all"
+        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-[13px] text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all"
       />
     )}
   </div>
@@ -41,15 +41,15 @@ const ExportCard = ({ title, description, icon, color, onExport, filters, setFil
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/70 shadow-sm flex flex-col overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 shadow-sm flex flex-col overflow-hidden">
       {/* Card header */}
-      <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-3">
+      <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
         <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center flex-shrink-0 shadow-sm`}>
           <span className="text-white [&>svg]:w-5 [&>svg]:h-5">{icon}</span>
         </div>
         <div className="min-w-0">
-          <h3 className="text-[14px] font-bold text-slate-800 leading-tight">{title}</h3>
-          <p className="text-[12px] text-slate-400 mt-0.5 leading-snug">{description}</p>
+          <h3 className="text-[14px] font-bold text-slate-800 dark:text-slate-200 leading-tight">{title}</h3>
+          <p className="text-[12px] text-slate-400 dark:text-slate-500 mt-0.5 leading-snug">{description}</p>
         </div>
       </div>
 
@@ -57,8 +57,8 @@ const ExportCard = ({ title, description, icon, color, onExport, filters, setFil
       <div className="px-5 py-4 flex-1">
         {filterFields && filterFields.length > 0 ? (
           <div className="space-y-3">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Filters (optional)</p>
-            <div className="grid grid-cols-2 gap-3">
+            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Filters (optional)</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {filterFields.map(f => (
                 <FilterField
                   key={f.key}
@@ -70,7 +70,7 @@ const ExportCard = ({ title, description, icon, color, onExport, filters, setFil
             </div>
           </div>
         ) : (
-          <p className="text-[12px] text-slate-400 italic">No filters available for this export.</p>
+          <p className="text-[12px] text-slate-400 dark:text-slate-500 italic">No filters available for this export.</p>
         )}
       </div>
 
@@ -111,8 +111,7 @@ export default function Reports() {
     setError('');
     try {
       const clean = Object.fromEntries(Object.entries(filters).filter(([, v]) => v));
-      const url = urlFn(clean);
-      window.open(url, '_blank');
+      await urlFn(clean);
     } catch (e) {
       setError(e.message || 'Export failed');
     }
@@ -185,11 +184,11 @@ export default function Reports() {
       {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
 
       {/* Info banner */}
-      <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-blue-50 border border-blue-100">
+      <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20">
         <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
         </svg>
-        <p className="text-[13px] text-blue-700 font-medium">
+        <p className="text-[13px] text-blue-700 dark:text-blue-400 font-medium">
           All filters are optional. Leave them empty to export all records. Files open in a new tab and download automatically using your active session.
         </p>
       </div>

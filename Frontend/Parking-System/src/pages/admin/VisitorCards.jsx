@@ -73,29 +73,29 @@ export default function VisitorCards() {
 
   const columns = [
     { key: 'badge_number', label: 'Badge #', render: r => (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-sm font-mono font-bold">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-sm font-mono font-bold">
         #{r.badge_number}
       </span>
     )},
     { key: 'tenant', label: 'Company', render: r => (
       <div>
-        <p className="text-sm font-semibold text-slate-800">{r.tenant_id?.company_name || '—'}</p>
-        <p className="text-xs text-slate-400">Floor {r.tenant_id?.unit_id?.floor} · {r.tenant_id?.unit_id?.unit_number}</p>
+        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{r.tenant_id?.company_name || '—'}</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500">Floor {r.tenant_id?.unit_id?.floor} · {r.tenant_id?.unit_id?.unit_number}</p>
       </div>
     )},
     { key: 'status', label: 'Status', render: r => <StatusBadge status={r.status} pulse={r.status === 'IN_USE'} /> },
-    { key: 'issued_at', label: 'Issued', render: r => <span className="text-xs text-slate-500">{new Date(r.issued_at).toLocaleDateString()}</span> },
-    { key: 'remarks', label: 'Remarks', render: r => r.remarks ? <span className="text-xs text-slate-500 truncate max-w-[120px] block">{r.remarks}</span> : <span className="text-slate-300">—</span> },
+    { key: 'issued_at', label: 'Issued', render: r => <span className="text-xs text-slate-500 dark:text-slate-400">{new Date(r.issued_at).toLocaleDateString()}</span> },
+    { key: 'remarks', label: 'Remarks', render: r => r.remarks ? <span className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[120px] block">{r.remarks}</span> : <span className="text-slate-300">—</span> },
     { key: 'actions', label: '', render: r => (
       <div className="flex items-center gap-1.5 justify-end">
         {r.status === 'AVAILABLE' && (
-          <button onClick={() => handleCheckIn(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors">Check In</button>
+          <button onClick={() => handleCheckIn(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 hover:bg-blue-100 transition-colors">Check In</button>
         )}
         {r.status === 'IN_USE' && (
-          <button onClick={() => handleCheckOut(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors">Check Out</button>
+          <button onClick={() => handleCheckOut(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 transition-colors">Check Out</button>
         )}
         {(r.status === 'AVAILABLE' || r.status === 'IN_USE') && (
-          <button onClick={() => openDeactivate(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors">Deactivate</button>
+          <button onClick={() => openDeactivate(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-orange-50 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400 hover:bg-orange-100 transition-colors">Deactivate</button>
         )}
       </div>
     )},
@@ -116,19 +116,19 @@ export default function VisitorCards() {
       />
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-wrap gap-3 items-end">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-4 flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[180px]">
-          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Company</label>
+          <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Company</label>
           <select value={filters.tenant_id} onChange={e => { setFilters(f => ({ ...f, tenant_id: e.target.value })); setPage(1); }}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white">
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white dark:bg-slate-900">
             <option value="">All Companies</option>
             {tenants.map(t => <option key={t._id} value={t._id}>{t.company_name}</option>)}
           </select>
         </div>
         <div className="flex-1 min-w-[140px]">
-          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Status</label>
+          <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Status</label>
           <select value={filters.status} onChange={e => { setFilters(f => ({ ...f, status: e.target.value })); setPage(1); }}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white">
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white dark:bg-slate-900">
             <option value="">All</option>
             <option value="AVAILABLE">Available</option>
             <option value="IN_USE">In Use</option>
@@ -136,10 +136,10 @@ export default function VisitorCards() {
             <option value="DEACTIVATED">Deactivated</option>
           </select>
         </div>
-        <button onClick={() => { setFilters({ tenant_id: '', status: '' }); setPage(1); }} className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors">Clear</button>
+        <button onClick={() => { setFilters({ tenant_id: '', status: '' }); setPage(1); }} className="px-4 py-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors">Clear</button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
         <DataTable columns={columns} data={cards} loading={loading} emptyMessage="No visitor cards found" />
         <Pagination pagination={pagination} onPageChange={setPage} />
       </div>
@@ -155,7 +155,7 @@ export default function VisitorCards() {
           <TextInput label="Badge Number" required type="number" value={issueForm.badge_number} onChange={e => setIssueForm(f => ({ ...f, badge_number: e.target.value }))} placeholder="e.g. 5001" />
           <TextareaInput label="Remarks" value={issueForm.remarks} onChange={e => setIssueForm(f => ({ ...f, remarks: e.target.value }))} placeholder="Optional notes..." />
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setModal(null)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+            <button type="button" onClick={() => setModal(null)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors">Cancel</button>
             <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
               {submitting ? 'Issuing...' : 'Issue Card'}
             </button>
@@ -175,7 +175,7 @@ export default function VisitorCards() {
           </SelectInput>
           <TextareaInput label="Remarks" value={deactivateForm.remarks} onChange={e => setDeactivateForm(f => ({ ...f, remarks: e.target.value }))} placeholder="Optional notes..." />
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setModal(null)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+            <button type="button" onClick={() => setModal(null)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors">Cancel</button>
             <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
               {submitting ? 'Deactivating...' : 'Deactivate'}
             </button>
