@@ -4,6 +4,7 @@ import { fetchTenants, fetchEmployees, fetchParkingRecords, fetchBadges, fetchRe
 import StatCard from '../../Components/common/StatCard.jsx';
 import StatusBadge from '../../Components/common/StatusBadge.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from 'recharts';
 
 const QUICK_ACTIONS = [
   { to: '/admin/tenants',          label: 'Add Tenant',         color: 'bg-blue-600',   icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg> },
@@ -25,7 +26,7 @@ export default function Dashboard() {
     let cancelled = false;
 
     Promise.allSettled([
-      fetchTenants({ limit: 6 }),
+      fetchTenants({ limit: 20 }), // Fetch more to get accurate quota sums
       fetchEmployees({ limit: 1 }),
       fetchParkingRecords({ limit: 5, status: 'ACTIVE' }),
       fetchBadges({ limit: 1, status: 'ACTIVE' }),
@@ -54,10 +55,44 @@ export default function Dashboard() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
+  // --- Chart Data Preparation ---
+  const systemBarData = [
+    { name: 'Tenants', value: stats.tenants || 0, color: '#3b82f6' }, // Blue
+    { name: 'Staff', value: stats.employees || 0, color: '#8b5cf6' }, // Violet
+    { name: 'Parking', value: stats.activeParkingRecords || 0, color: '#10b981' }, // Emerald
+    { name: 'Badges', value: stats.activeBadges || 0, color: '#6366f1' }, // Indigo
+    { name: 'Visitors', value: stats.visitorCards || 0, color: '#14b8a6' }, // Teal
+  ];
+
+  const quotaSums = recentTenants.reduce((acc, t) => {
+    acc.allocated += (t.parking_quota?.assigned?.allocated || 0);
+    acc.used += (t.parking_quota?.assigned?.used || 0);
+    return acc;
+  }, { allocated: 0, used: 0 });
+
+  const parkingPieData = [
+    { name: 'Available Slots', value: Math.max(0, quotaSums.allocated - quotaSums.used), color: '#10b981' }, // Emerald
+    { name: 'Occupied Slots', value: quotaSums.used, color: '#64748b' }, // Slate-500
+  ];
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl rounded-xl p-3">
+          <p className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 mb-1">{payload[0].payload.name}</p>
+          <p className="text-[13px] font-bold" style={{ color: payload[0].payload.color }}>
+            {payload[0].value} {payload[0].payload.name === 'Available Slots' || payload[0].payload.name === 'Occupied Slots' ? 'Slots' : 'Active'}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="space-y-5">
       {/* Welcome banner */}
-      <div className="relative rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 p-5 sm:p-6 text-white overflow-hidden">
+      <div className="relative rounded-2xl bg-gradient-to-r from-slate-800 to-slate-900 p-5 sm:p-6 text-white overflow-hidden">
         <div className="absolute inset-0 bg-grid opacity-10 pointer-events-none" />
         <div className="relative">
           <p className="text-blue-200 text-[12px] font-medium">{greeting},</p>
@@ -81,29 +116,93 @@ export default function Dashboard() {
         <StatCard label="Visitor Cards"  value={loading ? '…' : stats.visitorCards}         color="teal"   icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>} />
       </div>
 
+      {/* --- Data Visualizations Grid --- */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+        
+        {/* Chart 1: System Utilization */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 dark:border-slate-800 shadow-[0_2px_12px_rgb(0,0,0,0.03)] dark:shadow-none p-5 hidden sm:block">
+          <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 mb-6">System Utilization Summary</p>
+          <div className="h-[260px] w-full">
+            {loading ? (
+              <div className="w-full h-full flex items-center justify-center">
+                 <div className="w-6 h-6 border-2 border-slate-200 dark:border-slate-800/20 border-t-slate-800 dark:border-t-slate-400 rounded-full animate-spin" />
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={systemBarData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-slate-200 dark:text-slate-800 opacity-50" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} />
+                  <ChartTooltip content={<CustomTooltip />} cursor={{ fill: 'currentColor', className: 'text-slate-50 dark:text-slate-800 opacity-40' }} />
+                  <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={40} animationDuration={1000}>
+                    {systemBarData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        {/* Chart 2: Quota Allocations */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 dark:border-slate-800 shadow-[0_2px_12px_rgb(0,0,0,0.03)] dark:shadow-none p-5 hidden sm:block">
+          <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 mb-6">Tenant Parking Volume (Allocated vs Used)</p>
+          <div className="h-[260px] w-full">
+             {loading ? (
+              <div className="w-full h-full flex items-center justify-center">
+                 <div className="w-6 h-6 border-2 border-slate-200 dark:border-slate-800/20 border-t-slate-800 dark:border-t-slate-400 rounded-full animate-spin" />
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                  <Pie
+                    data={parkingPieData}
+                    cx="50%"
+                    cy="45%"
+                    innerRadius={70}
+                    outerRadius={95}
+                    paddingAngle={3}
+                    dataKey="value"
+                    animationDuration={1000}
+                    stroke="none"
+                  >
+                    {parkingPieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <ChartTooltip content={<CustomTooltip />} />
+                  <Legend verticalAlign="bottom" height={20} iconType="circle" wrapperStyle={{ fontSize: '11px', color: '#94a3b8' }} />
+                </PieChart>
+              </ResponsiveContainer>
+             )}
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
         {/* Recent tenants */}
-        <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 dark:border-slate-800 shadow-[0_2px_12px_rgb(0,0,0,0.03)] dark:shadow-none overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800/60 mt-1">
             <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200">Recent Tenants</p>
-            <Link to="/admin/tenants" className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:text-blue-400 transition-colors">View all →</Link>
+            <Link to="/admin/tenants" className="text-[12px] font-semibold text-slate-900 dark:text-emerald-400 hover:text-slate-600 dark:hover:text-emerald-300 transition-colors">View all →</Link>
           </div>
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-6 h-6 border-2 border-blue-100 dark:border-blue-500/20 border-t-blue-600 rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-slate-200 dark:border-slate-800/20 border-t-slate-800 dark:border-t-slate-400 rounded-full animate-spin" />
             </div>
           ) : recentTenants.length === 0 ? (
             <p className="text-center text-[13px] text-slate-400 dark:text-slate-500 py-12">No tenants yet</p>
           ) : (
-            <div className="divide-y divide-slate-50">
-              {recentTenants.map(t => (
-                <div key={t._id} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50/60 dark:bg-slate-800/60 transition-colors">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+            <div className="divide-y divide-slate-50 dark:divide-slate-800/50">
+              {recentTenants.slice(0, 5).map(t => (
+                <div key={t._id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center flex-shrink-0 shadow-sm">
                     <span className="text-white text-[11px] font-bold">{t.company_name?.charAt(0)}</span>
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 truncate">{t.company_name}</p>
-                    <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">Floor {t.unit_id?.floor} · Unit {t.unit_id?.unit_number}</p>
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">Floor {t.unit_id?.floor} · Unit {t.unit_id?.unit_number}</p>
                   </div>
                   <StatusBadge status={t.status} />
                 </div>
@@ -113,20 +212,20 @@ export default function Dashboard() {
         </div>
 
         {/* Quick actions */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 shadow-sm p-5">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 dark:border-slate-800 shadow-[0_2px_12px_rgb(0,0,0,0.03)] dark:shadow-none p-5 h-fit">
           <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 mb-4">Quick Actions</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2.5">
             {QUICK_ACTIONS.map(a => (
               <Link
                 key={a.to}
                 to={a.to}
-                className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:border-slate-700/80 hover:bg-slate-50/60 dark:bg-slate-800/60 transition-all group"
+                className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 hover:border-slate-200 dark:hover:border-slate-700 hover:bg-slate-50/60 dark:hover:bg-slate-800/50 transition-all group shadow-sm dark:shadow-none"
               >
                 <div className={`w-7 h-7 rounded-lg ${a.color} flex items-center justify-center flex-shrink-0 shadow-sm`}>
-                  <span className="text-white [&>svg]:w-3.5 [&>svg]:h-3.5">{a.icon}</span>
+                  <span className="text-white [&>svg]:w-[14px] [&>svg]:h-[14px]">{a.icon}</span>
                 </div>
-                <span className="text-[12px] font-semibold text-slate-600 dark:text-slate-400 group-hover:text-slate-800 dark:text-slate-200 transition-colors truncate">{a.label}</span>
-                <svg className="w-3.5 h-3.5 text-slate-300 ml-auto flex-shrink-0 group-hover:text-slate-400 dark:text-slate-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span className="text-[12.5px] font-semibold text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors truncate">{a.label}</span>
+                <svg className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 ml-auto flex-shrink-0 group-hover:text-slate-400 dark:group-hover:text-slate-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -137,26 +236,26 @@ export default function Dashboard() {
 
       {/* Active parking table */}
       {recentParking.length > 0 && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 dark:border-slate-800 shadow-[0_2px_12px_rgb(0,0,0,0.03)] dark:shadow-none overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800/60">
             <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200">Active Parking Records</p>
-            <Link to="/admin/parking" className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:text-blue-400 transition-colors">View all →</Link>
+            <Link to="/admin/parking" className="text-[12px] font-semibold text-slate-900 dark:text-emerald-400 hover:text-slate-600 dark:hover:text-emerald-300 transition-colors">View all →</Link>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead>
-                <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/60">
+                <tr className="border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-900/50">
                   {['Employee', 'Company', 'Plate', 'Type', 'Slot'].map(h => (
-                    <th key={h} className="px-5 py-3 text-left text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-5 py-3.5 text-left text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
                 {recentParking.map(r => (
-                  <tr key={r._id} className="hover:bg-slate-50/60 dark:bg-slate-800/60 transition-colors">
+                  <tr key={r._id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
                     <td className="px-5 py-3.5 text-[13px] font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">{r.employee_id?.full_name || '—'}</td>
                     <td className="px-5 py-3.5 text-[13px] text-slate-500 dark:text-slate-400 whitespace-nowrap">{r.tenant_id?.company_name || '—'}</td>
-                    <td className="px-5 py-3.5 text-[13px] font-mono font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">{r.car_plate_number}</td>
+                    <td className="px-5 py-3.5 text-[12px] font-mono font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">{r.car_plate_number}</td>
                     <td className="px-5 py-3.5 whitespace-nowrap"><StatusBadge status={r.parking_type} /></td>
                     <td className="px-5 py-3.5 text-[12px] font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap">{r.assigned_slot?.slot_code || '—'}</td>
                   </tr>

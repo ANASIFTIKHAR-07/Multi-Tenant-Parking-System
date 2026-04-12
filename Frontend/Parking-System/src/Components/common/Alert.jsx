@@ -4,7 +4,7 @@ const CFG = {
   error:   { wrap: 'bg-red-50 dark:bg-red-500/10 border-red-200',     icon: 'text-red-500',     text: 'text-red-800'     },
   success: { wrap: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200', icon: 'text-emerald-500', text: 'text-emerald-800' },
   warning: { wrap: 'bg-amber-50 border-amber-200',  icon: 'text-amber-500',   text: 'text-amber-800'   },
-  info:    { wrap: 'bg-blue-50 dark:bg-blue-500/10 border-blue-200',    icon: 'text-blue-500',    text: 'text-blue-800 dark:text-blue-300'    },
+  info:    { wrap: 'bg-slate-50 dark:bg-blue-500/10 border-blue-200',    icon: 'text-blue-500',    text: 'text-blue-800 dark:text-blue-300'    },
 };
 
 const ICONS = {

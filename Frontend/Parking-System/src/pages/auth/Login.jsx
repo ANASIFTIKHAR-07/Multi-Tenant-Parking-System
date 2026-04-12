@@ -41,13 +41,13 @@ export default function Login() {
       <div className="absolute inset-0 bg-grid opacity-60 dark:opacity-20 pointer-events-none" />
 
       {/* Soft glow blobs */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-100 dark:bg-blue-900/40 rounded-full opacity-30 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-indigo-100 dark:bg-indigo-900/40 rounded-full opacity-25 blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-slate-200 dark:bg-slate-800/40 rounded-full opacity-30 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-emerald-100/50 dark:bg-emerald-900/20 rounded-full opacity-25 blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-[400px] relative">
         {/* Brand mark */}
         <div className="text-center mb-8">
-          <div className="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 items-center justify-center shadow-lg shadow-blue-600/25 mb-4">
+          <div className="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 items-center justify-center shadow-lg shadow-slate-900/20 mb-4">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
             </svg>
@@ -85,7 +85,7 @@ export default function Login() {
                     value={form.email}
                     onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                     placeholder="admin@example.com"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 text-[13px] text-slate-900 dark:text-white placeholder-slate-400 bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:bg-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 text-[13px] text-slate-900 dark:text-white placeholder-slate-400 bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:bg-slate-900 focus:border-slate-800 focus:ring-2 focus:ring-slate-900/5 outline-none transition-all hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700"
                   />
                 </div>
               </div>
@@ -107,7 +107,7 @@ export default function Login() {
                     value={form.password}
                     onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 text-[13px] text-slate-900 dark:text-white placeholder-slate-400 bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:bg-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 text-[13px] text-slate-900 dark:text-white placeholder-slate-400 bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:bg-slate-900 focus:border-slate-800 focus:ring-2 focus:ring-slate-900/5 outline-none transition-all hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700"
                   />
                   <button
                     type="button"
@@ -127,7 +127,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={submitting || loading}
-                className="w-full mt-2 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-[13px] font-semibold rounded-xl shadow-sm shadow-blue-600/25 transition-all flex items-center justify-center gap-2"
+                className="w-full mt-2 py-2.5 bg-slate-900 hover:bg-black active:bg-slate-900 disabled:opacity-60 disabled:cursor-not-allowed text-white text-[13px] font-semibold rounded-xl shadow-sm shadow-slate-900/20 transition-all flex items-center justify-center gap-2"
               >
                 {submitting ? (
                   <>

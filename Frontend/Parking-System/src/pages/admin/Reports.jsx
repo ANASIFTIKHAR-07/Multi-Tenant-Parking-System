@@ -12,7 +12,7 @@ const FilterField = ({ field, value, onChange }) => (
       <select
         value={value || ''}
         onChange={e => onChange(e.target.value)}
-        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-[13px] text-slate-800 dark:text-slate-200 outline-none bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all"
+        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-[13px] text-slate-800 dark:text-slate-200 outline-none bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700 focus:border-slate-800 focus:ring-2 focus:ring-slate-900/5 transition-all"
       >
         <option value="">All</option>
         {field.options.map(o => (
@@ -25,7 +25,7 @@ const FilterField = ({ field, value, onChange }) => (
         value={value || ''}
         onChange={e => onChange(e.target.value)}
         placeholder={field.placeholder}
-        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-[13px] text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all"
+        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-[13px] text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700 focus:border-slate-800 focus:ring-2 focus:ring-slate-900/5 transition-all"
       />
     )}
   </div>
@@ -184,7 +184,7 @@ export default function Reports() {
       {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
 
       {/* Info banner */}
-      <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20">
+      <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-slate-50 dark:bg-blue-500/10 border border-blue-100 dark:border-slate-800/20">
         <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
         </svg>

@@ -92,7 +92,7 @@ export default function Tenants() {
   const columns = useMemo(() => [
     { key: 'company_name', label: 'Company', render: r => (
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center flex-shrink-0">
           <span className="text-white text-xs font-bold">{r.company_name?.charAt(0)}</span>
         </div>
         <div>
@@ -116,7 +116,7 @@ export default function Tenants() {
     )},
     { key: 'parking', label: 'Parking Quota', render: r => (
       <div className="flex gap-2 text-xs">
-        <span className="px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 font-medium">A:{r.parking_quota?.assigned?.used}/{r.parking_quota?.assigned?.allocated}</span>
+        <span className="px-1.5 py-0.5 rounded bg-slate-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 font-medium">A:{r.parking_quota?.assigned?.used}/{r.parking_quota?.assigned?.allocated}</span>
         <span className="px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 font-medium">P:{r.parking_quota?.pool?.used}/{r.parking_quota?.pool?.allocated}</span>
         <span className="px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-medium">R:{r.parking_quota?.rental?.used}/{r.parking_quota?.rental?.allocated}</span>
       </div>
@@ -140,7 +140,7 @@ export default function Tenants() {
         subtitle="Manage company tenants and their parking quotas"
         icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>}
         actions={
-          <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm shadow-blue-500/25 transition-colors">
+          <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-semibold rounded-xl shadow-sm shadow-blue-500/25 transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
             Add Tenant
           </button>
@@ -152,7 +152,7 @@ export default function Tenants() {
         <div className="flex-1 min-w-[140px]">
           <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Status</label>
           <select value={filters.status} onChange={e => { setFilters(f => ({ ...f, status: e.target.value })); setPage(1); }}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white dark:bg-slate-900">
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-slate-800 focus:ring-2 focus:ring-slate-200 transition-all bg-white dark:bg-slate-900">
             <option value="">All Statuses</option>
             <option value="ACTIVE">Active</option>
             <option value="INACTIVE">Inactive</option>
@@ -162,7 +162,7 @@ export default function Tenants() {
         <div className="flex-1 min-w-[140px]">
           <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Floor</label>
           <input value={filters.floor} onChange={e => { setFilters(f => ({ ...f, floor: e.target.value })); setPage(1); }}
-            placeholder="Floor number" className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all" />
+            placeholder="Floor number" className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-slate-800 focus:ring-2 focus:ring-slate-200 transition-all" />
         </div>
         <button onClick={() => { setFilters({ status: '', floor: '' }); setPage(1); }} className="px-4 py-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors">Clear</button>
       </div>
@@ -197,7 +197,7 @@ export default function Tenants() {
           <TextareaInput label="Remarks" value={form.remarks} onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))} placeholder="Optional notes..." />
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={() => setModal(null)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors">Cancel</button>
-            <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+            <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-slate-900 hover:bg-black disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
               {submitting ? 'Saving...' : editing ? 'Update' : 'Create Tenant'}
             </button>
           </div>
@@ -216,7 +216,7 @@ export default function Tenants() {
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={() => setQuotaModal(false)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors">Cancel</button>
-            <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+            <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-slate-900 hover:bg-black disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
               {submitting ? 'Saving...' : 'Update Quota'}
             </button>
           </div>

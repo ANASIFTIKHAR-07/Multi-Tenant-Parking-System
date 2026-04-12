@@ -1,7 +1,7 @@
 import React from 'react';
 
 const COLORS = {
-  blue:   { bg: 'bg-blue-50 dark:bg-blue-500/10',    border: 'border-blue-100 dark:border-blue-500/20',   icon: 'bg-blue-600',    text: 'text-blue-700 dark:text-blue-400',    sub: 'text-blue-500 dark:text-blue-400/80' },
+  blue:   { bg: 'bg-slate-50 dark:bg-blue-500/10',    border: 'border-blue-100 dark:border-slate-800/20',   icon: 'bg-blue-600',    text: 'text-blue-700 dark:text-blue-400',    sub: 'text-blue-500 dark:text-blue-400/80' },
   green:  { bg: 'bg-emerald-50 dark:bg-emerald-500/10', border: 'border-emerald-100 dark:border-emerald-500/20',icon: 'bg-emerald-600', text: 'text-emerald-700 dark:text-emerald-400', sub: 'text-emerald-500 dark:text-emerald-400/80' },
   purple: { bg: 'bg-violet-50 dark:bg-violet-500/10',  border: 'border-violet-100 dark:border-violet-500/20', icon: 'bg-violet-600',  text: 'text-violet-700 dark:text-violet-400',  sub: 'text-violet-500 dark:text-violet-400/80' },
   orange: { bg: 'bg-orange-50 dark:bg-orange-500/10',  border: 'border-orange-100 dark:border-orange-500/20', icon: 'bg-orange-500',  text: 'text-orange-700 dark:text-orange-400',  sub: 'text-orange-500 dark:text-orange-400/80' },

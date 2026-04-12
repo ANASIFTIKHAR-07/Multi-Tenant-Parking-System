@@ -24,7 +24,7 @@ export default function FormField({ label, required, error, children, hint }) {
 
 const inputBase = `w-full px-3.5 py-2.5 rounded-xl border text-[13px] text-slate-900 dark:text-white placeholder-slate-400 bg-white dark:bg-slate-900
   transition-all duration-150 outline-none hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700
-  focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10`;
+  focus:border-slate-800 focus:ring-2 focus:ring-slate-900/5`;
 
 export function TextInput({ label, required, error, hint, className = '', ...props }) {
   return (

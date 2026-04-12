@@ -34,7 +34,7 @@ const CONFIG = {
   },
   info: {
     bar:    'bg-blue-500',
-    icon:   'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400',
+    icon:   'bg-slate-50 dark:bg-blue-500/10 text-slate-900 dark:text-blue-400',
     title:  'text-slate-900 dark:text-white',
     svg: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -108,7 +108,7 @@ export default function Badges() {
         subtitle="Issue and manage employee access badges"
         icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" /></svg>}
         actions={
-          <button onClick={openIssue} className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm shadow-blue-500/25 transition-colors">
+          <button onClick={openIssue} className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-semibold rounded-xl shadow-sm shadow-blue-500/25 transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
             Issue Badge
           </button>
@@ -120,7 +120,7 @@ export default function Badges() {
         <div className="flex-1 min-w-[180px]">
           <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Company</label>
           <select value={filters.tenant_id} onChange={e => { setFilters(f => ({ ...f, tenant_id: e.target.value })); setPage(1); }}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white dark:bg-slate-900">
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-slate-800 focus:ring-2 focus:ring-slate-200 transition-all bg-white dark:bg-slate-900">
             <option value="">All Companies</option>
             {tenants.map(t => <option key={t._id} value={t._id}>{t.company_name}</option>)}
           </select>
@@ -128,7 +128,7 @@ export default function Badges() {
         <div className="flex-1 min-w-[140px]">
           <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Status</label>
           <select value={filters.status} onChange={e => { setFilters(f => ({ ...f, status: e.target.value })); setPage(1); }}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white dark:bg-slate-900">
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-slate-800 focus:ring-2 focus:ring-slate-200 transition-all bg-white dark:bg-slate-900">
             <option value="">All</option>
             <option value="ACTIVE">Active</option>
             <option value="INACTIVE">Inactive</option>
@@ -151,7 +151,7 @@ export default function Badges() {
           <div>
             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Filter by Company</label>
             <select value={tenantFilter} onChange={e => setTenantFilter(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white dark:bg-slate-900">
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-slate-800 focus:ring-2 focus:ring-slate-200 transition-all bg-white dark:bg-slate-900">
               <option value="">Select company first</option>
               {tenants.map(t => <option key={t._id} value={t._id}>{t.company_name}</option>)}
             </select>
@@ -172,7 +172,7 @@ export default function Badges() {
           <TextareaInput label="Remarks" value={form.remarks} onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))} placeholder="Optional notes..." />
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={() => setModal(null)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors">Cancel</button>
-            <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+            <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-slate-900 hover:bg-black disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
               {submitting ? 'Issuing...' : 'Issue Badge'}
             </button>
           </div>

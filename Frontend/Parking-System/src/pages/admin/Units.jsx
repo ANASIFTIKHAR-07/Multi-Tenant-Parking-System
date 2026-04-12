@@ -75,7 +75,7 @@ export default function Units() {
     { key: 'zone', label: 'Zone', render: r => r.zone || <span className="text-slate-300">—</span> },
     { key: 'unit_space_sqm', label: 'Area (sqm)', render: r => `${r.unit_space_sqm} m²` },
     { key: 'max_card_limit', label: 'Card Limit', render: r => (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-xs font-semibold ring-1 ring-blue-100">{r.max_card_limit}</span>
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-xs font-semibold ring-1 ring-blue-100">{r.max_card_limit}</span>
     )},
     { key: 'owner', label: 'Owner', render: r => (
       <div>
@@ -98,7 +98,7 @@ export default function Units() {
         subtitle="Manage building units and their configurations"
         icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>}
         actions={
-          <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm shadow-blue-500/25 transition-colors">
+          <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-semibold rounded-xl shadow-sm shadow-blue-500/25 transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
             Add Unit
           </button>
@@ -110,12 +110,12 @@ export default function Units() {
         <div className="flex-1 min-w-[140px]">
           <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Floor</label>
           <input value={filters.floor} onChange={e => { setFilters(f => ({ ...f, floor: e.target.value })); setPage(1); }}
-            placeholder="e.g. 1, 2, B1" className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all" />
+            placeholder="e.g. 1, 2, B1" className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-slate-800 focus:ring-2 focus:ring-slate-200 transition-all" />
         </div>
         <div className="flex-1 min-w-[140px]">
           <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Zone</label>
           <input value={filters.zone} onChange={e => { setFilters(f => ({ ...f, zone: e.target.value })); setPage(1); }}
-            placeholder="Zone A, B..." className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all" />
+            placeholder="Zone A, B..." className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-slate-800 focus:ring-2 focus:ring-slate-200 transition-all" />
         </div>
         <button onClick={() => { setFilters({ floor: '', zone: '' }); setPage(1); }} className="px-4 py-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors">
           Clear
@@ -148,7 +148,7 @@ export default function Units() {
           <TextareaInput label="Remarks" value={form.remarks} onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))} placeholder="Optional notes..." />
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={() => setModal(null)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors">Cancel</button>
-            <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+            <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-slate-900 hover:bg-black disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
               {submitting ? 'Saving...' : editing ? 'Update Unit' : 'Create Unit'}
             </button>
           </div>

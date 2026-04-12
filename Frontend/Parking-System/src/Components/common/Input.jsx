@@ -19,14 +19,14 @@ const Input = ({
   
   const variants = {
     // Original variant
-    default: 'rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500',
+    default: 'rounded-md border border-gray-300 focus:ring-blue-500 focus:border-slate-800',
     
     // New theme variants
-    glass: 'rounded-xl border border-white border-opacity-30 bg-white dark:bg-slate-900 bg-opacity-90 backdrop-blur-sm focus:ring-blue-500 focus:border-blue-500 focus:bg-opacity-100',
+    glass: 'rounded-xl border border-white border-opacity-30 bg-white dark:bg-slate-900 bg-opacity-90 backdrop-blur-sm focus:ring-blue-500 focus:border-slate-800 focus:bg-opacity-100',
     glassDark: 'rounded-xl border border-gray-600 border-opacity-40 bg-gray-900 bg-opacity-20 backdrop-blur-sm text-white placeholder:text-gray-300 focus:ring-purple-500 focus:border-purple-500',
-    soft: 'rounded-xl border-2 border-blue-100 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 focus:ring-blue-500 focus:border-blue-300 focus:bg-white dark:bg-slate-900',
+    soft: 'rounded-xl border-2 border-blue-100 dark:border-slate-800/20 bg-slate-50 dark:bg-blue-500/10 focus:ring-blue-500 focus:border-blue-300 focus:bg-white dark:bg-slate-900',
     premium: 'rounded-2xl border-2 border-transparent bg-gradient-to-r from-blue-50 to-purple-50 focus:ring-purple-500 focus:from-white focus:to-white shadow-lg',
-    outline: 'rounded-lg border-2 border-gray-200 bg-transparent focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300'
+    outline: 'rounded-lg border-2 border-gray-200 bg-transparent focus:ring-blue-500 focus:border-slate-800 hover:border-gray-300'
   };
   
   const sizes = {

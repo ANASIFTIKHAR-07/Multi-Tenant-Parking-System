@@ -77,8 +77,8 @@ function NavItem({ item, collapsed, onClick }) {
         `flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-150 group relative
         ${collapsed ? 'justify-center' : ''}
         ${isActive
-          ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
-          : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200 dark:text-slate-200'
+          ? 'bg-slate-900 text-white shadow-sm shadow-slate-900/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:shadow-none'
+          : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-800 dark:hover:text-slate-200'
         }`
       }
     >
@@ -86,7 +86,7 @@ function NavItem({ item, collapsed, onClick }) {
         <>
           {/* Active indicator bar */}
           {isActive && !collapsed && (
-            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-blue-300 rounded-r-full -ml-3" />
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-slate-400 rounded-r-full -ml-3" />
           )}
           <span className={`flex-shrink-0 transition-colors ${isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:text-slate-400'}`}>
             {item.icon}
@@ -111,7 +111,7 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
     <div className="flex flex-col h-full bg-white dark:bg-slate-900">
       {/* Brand */}
       <div className={`flex items-center gap-3 h-16 px-4 border-b border-slate-100 dark:border-slate-800 flex-shrink-0 ${collapsed ? 'justify-center' : ''}`}>
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center flex-shrink-0 shadow-md shadow-blue-600/25">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0 shadow-md shadow-slate-900/20">
           <svg className="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
           </svg>
@@ -155,7 +155,7 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 dark:bg-slate-800/40 transition-colors"
             >
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center flex-shrink-0 shadow-sm">
                 <span className="text-white text-[11px] font-bold leading-none">{admin?.name?.charAt(0)?.toUpperCase() || 'A'}</span>
               </div>
               <div className="min-w-0 flex-1">
@@ -184,7 +184,7 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
               title="Profile"
               className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 transition-colors"
             >
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center shadow-sm">
                 <span className="text-white text-[11px] font-bold leading-none">{admin?.name?.charAt(0)?.toUpperCase() || 'A'}</span>
               </div>
             </Link>
@@ -311,7 +311,7 @@ function TopBar({ onMenuClick, admin }) {
             onClick={() => setDropdownOpen(v => !v)}
             className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 transition-colors"
           >
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm flex-shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center shadow-sm flex-shrink-0">
               <span className="text-white text-[11px] font-bold leading-none">{admin?.name?.charAt(0)?.toUpperCase() || 'A'}</span>
             </div>
             <span className="hidden sm:block text-[13px] font-medium text-slate-700 dark:text-slate-300 max-w-[120px] truncate">{admin?.name || 'Admin'}</span>
@@ -327,8 +327,8 @@ function TopBar({ onMenuClick, admin }) {
               <div className="px-4 py-3.5 border-b border-slate-100 dark:border-slate-800">
                 <p className="text-[13px] font-semibold text-slate-900 dark:text-white truncate">{admin?.name}</p>
                 <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">{admin?.email}</p>
-                <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-[10px] font-semibold ring-1 ring-blue-200/60">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-emerald-500/10 text-slate-800 dark:text-emerald-400 text-[10px] font-semibold ring-1 ring-slate-200/80 dark:ring-emerald-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-800 dark:bg-emerald-500" />
                   {admin?.role?.toUpperCase() || 'ADMIN'}
                 </span>
               </div>

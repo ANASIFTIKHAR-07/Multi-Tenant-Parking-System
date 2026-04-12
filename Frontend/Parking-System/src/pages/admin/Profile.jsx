@@ -19,7 +19,7 @@ function PasswordInput({ id, label, value, show, onToggle, onChange, placeholder
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900 text-[13.5px] text-slate-900 dark:text-white placeholder-slate-400 outline-none transition-all hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+          className="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900 text-[13.5px] text-slate-900 dark:text-white placeholder-slate-400 outline-none transition-all hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700 focus:border-slate-800 focus:ring-2 focus:ring-slate-900/5"
         />
         <button
           type="button" tabIndex={-1} onClick={onToggle}
@@ -138,7 +138,7 @@ export default function Profile() {
           <div className="px-6 pb-6 flex flex-col flex-1">
             {/* Avatar — sits outside overflow-hidden, so it renders correctly */}
             <div className="relative -mt-7 mb-4 w-fit">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center ring-[3px] ring-white shadow-lg shadow-blue-600/25"
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center ring-[3px] ring-white shadow-lg shadow-slate-900/20"
                 style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)' }}
               >
                 <span className="text-white text-[22px] font-bold leading-none">
@@ -151,7 +151,7 @@ export default function Profile() {
             <div className="mb-5">
               <p className="text-[17px] font-bold text-slate-900 dark:text-white">{admin?.name || 'Admin'}</p>
               <p className="text-[13px] text-slate-400 dark:text-slate-500 mt-0.5">{admin?.email}</p>
-              <span className="inline-flex items-center gap-1.5 mt-2.5 px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-200/60 text-[11px] font-semibold text-blue-700 dark:text-blue-400 tracking-wide">
+              <span className="inline-flex items-center gap-1.5 mt-2.5 px-2.5 py-1 rounded-full bg-slate-50 dark:bg-blue-500/10 border border-blue-200/60 text-[11px] font-semibold text-blue-700 dark:text-blue-400 tracking-wide">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                 {(admin?.role || 'ADMIN').toUpperCase()}
               </span>
@@ -181,8 +181,8 @@ export default function Profile() {
         {/* ── RIGHT: Change password ── */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden h-full flex flex-col">
           <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-blue-500/10 border border-blue-100 dark:border-slate-800/20 flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-slate-900 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
@@ -268,7 +268,7 @@ export default function Profile() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-[13.5px] font-semibold rounded-xl shadow-sm shadow-blue-600/20 transition-all"
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-900 hover:bg-black active:bg-slate-900 disabled:opacity-60 disabled:cursor-not-allowed text-white text-[13.5px] font-semibold rounded-xl shadow-sm shadow-blue-600/20 transition-all"
             >
               {submitting ? (
                 <>

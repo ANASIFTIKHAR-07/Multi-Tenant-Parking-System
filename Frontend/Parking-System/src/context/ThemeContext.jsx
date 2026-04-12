@@ -3,15 +3,13 @@ import { createContext, useContext, useEffect, useState } from 'react';
 const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
-  // Use 'system' as default but respect 'theme' in localStorage
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'system';
+    return localStorage.getItem('theme') || 'light';
   });
 
   useEffect(() => {
     const root = window.document.documentElement;
     
-    // Remove both classes to start fresh
     root.classList.remove('light', 'dark');
 
     if (theme === 'system') {

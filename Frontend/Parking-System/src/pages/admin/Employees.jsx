@@ -117,7 +117,7 @@ export default function Employees() {
     )},
     { key: 'actions', label: '', render: r => (
       <div className="flex items-center gap-1.5 justify-end">
-        <button onClick={() => openDetail(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 hover:bg-blue-100 transition-colors">View</button>
+        <button onClick={() => openDetail(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 hover:bg-blue-100 transition-colors">View</button>
         <button onClick={() => openAddVehicle(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors">+ Vehicle</button>
         <button onClick={() => openEdit(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors">Edit</button>
         <button onClick={() => handleDelete(r)} className="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 transition-colors">Delete</button>
@@ -132,7 +132,7 @@ export default function Employees() {
         subtitle="Manage employees and their registered vehicles"
         icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>}
         actions={
-          <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm shadow-blue-500/25 transition-colors">
+          <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-semibold rounded-xl shadow-sm shadow-blue-500/25 transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
             Add Employee
           </button>
@@ -144,7 +144,7 @@ export default function Employees() {
         <div className="flex-1 min-w-[180px]">
           <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Company</label>
           <select value={filters.tenant_id} onChange={e => { setFilters(f => ({ ...f, tenant_id: e.target.value })); setPage(1); }}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white dark:bg-slate-900">
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-slate-800 focus:ring-2 focus:ring-slate-200 transition-all bg-white dark:bg-slate-900">
             <option value="">All Companies</option>
             {tenants.map(t => <option key={t._id} value={t._id}>{t.company_name}</option>)}
           </select>
@@ -152,7 +152,7 @@ export default function Employees() {
         <div className="flex-1 min-w-[140px]">
           <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Status</label>
           <select value={filters.status} onChange={e => { setFilters(f => ({ ...f, status: e.target.value })); setPage(1); }}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all bg-white dark:bg-slate-900">
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 text-sm outline-none focus:border-slate-800 focus:ring-2 focus:ring-slate-200 transition-all bg-white dark:bg-slate-900">
             <option value="">All</option>
             <option value="ACTIVE">Active</option>
             <option value="INACTIVE">Inactive</option>
@@ -188,7 +188,7 @@ export default function Employees() {
           <TextareaInput label="Remarks" value={form.remarks} onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))} placeholder="Optional notes..." />
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={() => setModal(null)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors">Cancel</button>
-            <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+            <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-slate-900 hover:bg-black disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
               {submitting ? 'Saving...' : editing ? 'Update' : 'Create Employee'}
             </button>
           </div>
@@ -205,12 +205,12 @@ export default function Employees() {
             <TextInput label="Car Tag" type="number" value={vehicleForm.car_tag} onChange={e => setVehicleForm(f => ({ ...f, car_tag: e.target.value }))} placeholder="1234" />
           </div>
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked={vehicleForm.is_primary} onChange={e => setVehicleForm(f => ({ ...f, is_primary: e.target.checked }))} className="w-4 h-4 rounded text-blue-600 dark:text-blue-400" />
+            <input type="checkbox" checked={vehicleForm.is_primary} onChange={e => setVehicleForm(f => ({ ...f, is_primary: e.target.checked }))} className="w-4 h-4 rounded text-slate-900 dark:text-blue-400" />
             <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Set as primary vehicle</span>
           </label>
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={() => setModal(null)} className="px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-xl transition-colors">Cancel</button>
-            <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+            <button type="submit" disabled={submitting} className="px-5 py-2.5 bg-slate-900 hover:bg-black disabled:opacity-60 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
               {submitting ? 'Adding...' : 'Add Vehicle'}
             </button>
           </div>
@@ -230,7 +230,7 @@ export default function Employees() {
             <div>
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Registered Vehicles</p>
-                <button onClick={() => { setModal(null); setTimeout(() => openAddVehicle(detailEmployee), 100); }} className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:text-blue-400">+ Add Vehicle</button>
+                <button onClick={() => { setModal(null); setTimeout(() => openAddVehicle(detailEmployee), 100); }} className="text-xs font-semibold text-slate-900 dark:text-blue-400 hover:text-blue-700 dark:text-blue-400">+ Add Vehicle</button>
               </div>
               {detailEmployee.vehicles?.length === 0 ? (
                 <p className="text-sm text-slate-400 dark:text-slate-500">No vehicles registered.</p>
@@ -244,7 +244,7 @@ export default function Employees() {
                           <p className="text-sm font-semibold font-mono text-slate-800 dark:text-slate-200">{v.car_plate_number}</p>
                           <p className="text-xs text-slate-400 dark:text-slate-500">{v.sticker_number ? `Sticker: ${v.sticker_number}` : ''}{v.car_tag ? ` · Tag: ${v.car_tag}` : ''}</p>
                         </div>
-                        {v.is_primary && <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-xs font-semibold ring-1 ring-blue-100">Primary</span>}
+                        {v.is_primary && <span className="px-2 py-0.5 rounded-full bg-slate-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-xs font-semibold ring-1 ring-blue-100">Primary</span>}
                       </div>
                       <button onClick={() => handleRemoveVehicle(detailEmployee._id, v.car_plate_number)} className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 font-medium">Remove</button>
                     </div>
@@ -266,10 +266,10 @@ export default function Employees() {
               <div>
                 <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider mb-2">Active Parking</p>
                 {detailEmployee.parking_records.map(p => (
-                  <div key={p._id} className="p-3 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 flex items-center gap-3">
+                  <div key={p._id} className="p-3 rounded-xl bg-slate-50 dark:bg-blue-500/10 border border-blue-100 dark:border-slate-800/20 flex items-center gap-3">
                     <StatusBadge status={p.parking_type} />
                     <span className="text-sm font-mono font-semibold text-blue-800 dark:text-blue-300">{p.car_plate_number}</span>
-                    {p.assigned_slot?.slot_code && <span className="text-xs text-blue-600 dark:text-blue-400">Slot: {p.assigned_slot.slot_code}</span>}
+                    {p.assigned_slot?.slot_code && <span className="text-xs text-slate-900 dark:text-blue-400">Slot: {p.assigned_slot.slot_code}</span>}
                   </div>
                 ))}
               </div>
