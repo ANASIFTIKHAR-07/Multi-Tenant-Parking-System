@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { fetchUnits, createUnit, updateUnit, deleteUnit } from '../../services/adminApi.js';
 import PageHeader from '../../Components/common/PageHeader.jsx';
 import DataTable from '../../Components/common/DataTable.jsx';
@@ -7,15 +7,16 @@ import Alert from '../../Components/common/Alert.jsx';
 import Modal from '../../Components/common/Modal.jsx';
 import { TextInput, SelectInput, TextareaInput } from '../../Components/common/FormField.jsx';
 import StatCard from '../../Components/common/StatCard.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
 
 const EMPTY = { floor: '', unit_number: '', zone: '', unit_space_sqm: '', owner_name: '', owner_qb_code: '', remarks: '' };
 
 export default function Units() {
+  const { toast } = useToast();
   const [units, setUnits] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [formError, setFormError] = useState('');
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({ floor: '', zone: '' });
   const [modal, setModal] = useState(null); // null | 'create' | 'edit'
@@ -29,7 +30,7 @@ export default function Units() {
       const res = await fetchUnits({ page, limit: 15, ...filters });
       setUnits(res?.data?.units ?? []);
       setPagination(res?.data?.pagination ?? null);
-    } catch (e) { setError(e.message); }
+    } catch (e) { toast.error('Error', e.message); }
     finally { setLoading(false); }
   }, [page, filters]);
 
@@ -44,7 +45,7 @@ export default function Units() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitting(true); setError('');
+    setSubmitting(true); setFormError('');
     try {
       const payload = {
         floor: form.floor, unit_number: form.unit_number, zone: form.zone || undefined,
@@ -52,17 +53,17 @@ export default function Units() {
         owner: { name: form.owner_name, qb_code: form.owner_qb_code || undefined },
         remarks: form.remarks || undefined,
       };
-      if (editing) { await updateUnit(editing._id, payload); setSuccess('Unit updated.'); }
-      else { await createUnit(payload); setSuccess('Unit created.'); }
+      if (editing) { await updateUnit(editing._id, payload); toast.success('Success', 'Unit updated.'); }
+      else { await createUnit(payload); toast.success('Success', 'Unit created.'); }
       setModal(null); load();
-    } catch (e) { setError(e.message); }
+    } catch (e) { toast.error('Error', e.message); setFormError(e.message); }
     finally { setSubmitting(false); }
   };
 
   const handleDelete = async (u) => {
     if (!confirm(`Delete unit ${u.unit_number} on floor ${u.floor}?`)) return;
-    try { await deleteUnit(u._id); setSuccess('Unit deleted.'); load(); }
-    catch (e) { setError(e.message); }
+    try { await deleteUnit(u._id); toast.success('Success', 'Unit deleted.'); load(); }
+    catch (e) { toast.error('Error', e.message); }
   };
 
   const columns = [
@@ -101,9 +102,6 @@ export default function Units() {
         }
       />
 
-      {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
-      {success && <Alert type="success" message={success} onDismiss={() => setSuccess('')} />}
-
       {/* Filters */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[140px]">
@@ -130,7 +128,7 @@ export default function Units() {
       {/* Form Modal */}
       <Modal isOpen={modal === 'form'} onClose={() => setModal(null)} title={editing ? 'Edit Unit' : 'Add New Unit'} size="large">
         <form onSubmit={handleSubmit} className="space-y-5">
-          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
           <div className="grid grid-cols-2 gap-4">
             <TextInput label="Floor" required value={form.floor} onChange={e => setForm(f => ({ ...f, floor: e.target.value }))} placeholder="e.g. 1, 2, B1" />
             <TextInput label="Unit Number" required value={form.unit_number} onChange={e => setForm(f => ({ ...f, unit_number: e.target.value }))} placeholder="e.g. 101, A-02" />

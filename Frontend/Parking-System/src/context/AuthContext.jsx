@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import * as auth from '../services/authApi.js';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import * as authApi from '../services/authApi.js';
 
 const AuthContext = createContext(null);
 
@@ -8,34 +8,34 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    auth.me()
+    let cancelled = false;
+    authApi.me()
       .then(res => {
-        // Backend ApiResponse: { statusCode, data: "string message", message: actualPayload }
-        setAdmin(res?.message || null);
+        if (!cancelled) setAdmin(res?.data || null);
       })
-      .catch(() => setAdmin(null))
-      .finally(() => setLoading(false));
+      .catch(() => { if (!cancelled) setAdmin(null); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, []);
 
   const login = async (credentials) => {
-    const res = await auth.login(credentials);
-    // Backend ApiResponse: { statusCode, data: "string message", message: { accessToken, refreshToken, loggedInAdmin } }
-    const payload = res?.message;
-    const adminData = payload?.loggedInAdmin ?? null;
+    const res = await authApi.login(credentials);
+    // ApiResponse: { statusCode, data: { accessToken, refreshToken, loggedInAdmin }, message }
+    const adminData = res?.data?.loggedInAdmin ?? null;
     setAdmin(adminData);
     return res;
   };
 
   const logout = async () => {
-    try {
-      await auth.logout();
-    } catch {
-      /* ignore: best-effort logout */
-    }
+    try { await authApi.logout(); } catch { /* best-effort */ }
     setAdmin(null);
   };
 
-  const value = useMemo(() => ({ admin, loading, login, logout }), [admin, loading]);
+  const value = useMemo(
+    () => ({ admin, loading, login, logout }),
+    [admin, loading] // login/logout are stable — defined in render scope but don't change
+  );
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

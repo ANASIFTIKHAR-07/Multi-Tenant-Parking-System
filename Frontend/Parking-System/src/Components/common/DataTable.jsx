@@ -1,4 +1,20 @@
-import React from 'react';
+import { memo } from 'react';
+
+// Memoized row — only re-renders when its data changes
+const TableRow = memo(function TableRow({ row, columns }) {
+  return (
+    <tr className="hover:bg-slate-50/60 transition-colors duration-100">
+      {columns.map((col) => (
+        <td
+          key={col.key}
+          className="px-4 py-3.5 text-[13px] text-slate-700 whitespace-nowrap first:pl-5 last:pr-5"
+        >
+          {col.render ? col.render(row) : (row[col.key] ?? <span className="text-slate-300">—</span>)}
+        </td>
+      ))}
+    </tr>
+  );
+});
 
 export default function DataTable({ columns, data, loading, emptyMessage = 'No records found', emptyIcon }) {
   if (loading) {
@@ -31,7 +47,6 @@ export default function DataTable({ columns, data, loading, emptyMessage = 'No r
   }
 
   return (
-    /* Horizontal scroll wrapper — critical for mobile */
     <div className="overflow-x-auto -mx-px">
       <table className="min-w-full">
         <thead>
@@ -47,20 +62,9 @@ export default function DataTable({ columns, data, loading, emptyMessage = 'No r
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
-          {data.map((row, i) => (
-            <tr
-              key={row._id || i}
-              className="hover:bg-slate-50/60 transition-colors duration-100"
-            >
-              {columns.map((col) => (
-                <td
-                  key={col.key}
-                  className="px-4 py-3.5 text-[13px] text-slate-700 whitespace-nowrap first:pl-5 last:pr-5"
-                >
-                  {col.render ? col.render(row) : (row[col.key] ?? <span className="text-slate-300">—</span>)}
-                </td>
-              ))}
-            </tr>
+          {data.map((row) => (
+            // Always use stable _id — never fall back to array index
+            <TableRow key={row._id} row={row} columns={columns} />
           ))}
         </tbody>
       </table>

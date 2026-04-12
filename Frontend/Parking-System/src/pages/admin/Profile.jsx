@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { changePassword } from '../../services/authApi.js';
 import Alert from '../../Components/common/Alert.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
 
 function PasswordInput({ id, label, value, show, onToggle, onChange, placeholder, autoComplete }) {
   return (
@@ -59,24 +60,25 @@ const STRENGTH_META = [
 
 export default function Profile() {
   const { admin } = useAuth();
+  const { toast } = useToast();
   const [form, setForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [show, setShow] = useState({ current: false, new: false, confirm: false });
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [formError, setFormError] = useState('');
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    setError(''); setSuccess('');
-    if (form.newPassword !== form.confirmPassword) { setError('New passwords do not match'); return; }
-    if (form.newPassword.length < 6) { setError('New password must be at least 6 characters'); return; }
+    setFormError('');
+    if (form.newPassword !== form.confirmPassword) { setFormError('New passwords do not match'); return; }
+    if (form.newPassword.length < 6) { setFormError('New password must be at least 6 characters'); return; }
     setSubmitting(true);
     try {
       await changePassword({ currentPassword: form.currentPassword, newPassword: form.newPassword });
-      setSuccess('Password changed successfully');
+      toast.success('Success', 'Password changed successfully');
       setForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (e) {
-      setError(e.message || 'Failed to change password');
+      toast.error('Error', e.message || 'Failed to change password');
+      setFormError(e.message || 'Failed to change password');
     } finally {
       setSubmitting(false);
     }
@@ -191,8 +193,7 @@ export default function Profile() {
           </div>
 
           <form onSubmit={handleChangePassword} className="px-6 py-5 space-y-4 flex-1">
-            {error   && <Alert type="error"   message={error}   onDismiss={() => setError('')}   />}
-            {success && <Alert type="success" message={success} onDismiss={() => setSuccess('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
 
             <PasswordInput
               id="currentPassword" label="Current Password"

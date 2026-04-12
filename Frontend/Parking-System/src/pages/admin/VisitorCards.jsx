@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { fetchVisitorCards, issueVisitorCard, checkInVisitor, checkOutVisitor, deactivateVisitorCard, fetchTenants } from '../../services/adminApi.js';
 import PageHeader from '../../Components/common/PageHeader.jsx';
 import DataTable from '../../Components/common/DataTable.jsx';
@@ -7,14 +7,15 @@ import Alert from '../../Components/common/Alert.jsx';
 import Modal from '../../Components/common/Modal.jsx';
 import StatusBadge from '../../Components/common/StatusBadge.jsx';
 import { TextInput, SelectInput, TextareaInput } from '../../Components/common/FormField.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
 
 export default function VisitorCards() {
+  const { toast } = useToast();
   const [cards, setCards] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [formError, setFormError] = useState('');
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({ tenant_id: '', status: '' });
   const [modal, setModal] = useState(null);
@@ -33,7 +34,7 @@ export default function VisitorCards() {
       setCards(cardsRes?.data?.cards ?? []);
       setPagination(cardsRes?.data?.pagination ?? null);
       setTenants(tenRes?.data?.tenants ?? []);
-    } catch (e) { setError(e.message); }
+    } catch (e) { toast.error('Error', e.message); }
     finally { setLoading(false); }
   }, [page, filters]);
 
@@ -43,30 +44,30 @@ export default function VisitorCards() {
   const openDeactivate = (c) => { setEditing(c); setDeactivateForm({ deactivation_reason: '', remarks: '' }); setModal('deactivate'); };
 
   const handleIssue = async (e) => {
-    e.preventDefault(); setSubmitting(true); setError('');
+    e.preventDefault(); setSubmitting(true); setFormError('');
     try {
       await issueVisitorCard({ tenant_id: issueForm.tenant_id, badge_number: Number(issueForm.badge_number), remarks: issueForm.remarks || undefined });
-      setSuccess('Visitor card issued.'); setModal(null); load();
-    } catch (e) { setError(e.message); }
+      toast.success('Success', 'Visitor card issued.'); setModal(null); load();
+    } catch (e) { toast.error('Error', e.message); setFormError(e.message); }
     finally { setSubmitting(false); }
   };
 
   const handleCheckIn = async (card) => {
-    try { await checkInVisitor(card._id); setSuccess('Visitor checked in.'); load(); }
-    catch (e) { setError(e.message); }
+    try { await checkInVisitor(card._id); toast.success('Success', 'Visitor checked in.'); load(); }
+    catch (e) { toast.error('Error', e.message); }
   };
 
   const handleCheckOut = async (card) => {
-    try { await checkOutVisitor(card._id); setSuccess('Visitor checked out.'); load(); }
-    catch (e) { setError(e.message); }
+    try { await checkOutVisitor(card._id); toast.success('Success', 'Visitor checked out.'); load(); }
+    catch (e) { toast.error('Error', e.message); }
   };
 
   const handleDeactivate = async (e) => {
-    e.preventDefault(); setSubmitting(true); setError('');
+    e.preventDefault(); setSubmitting(true); setFormError('');
     try {
       await deactivateVisitorCard(editing._id, { deactivation_reason: deactivateForm.deactivation_reason, remarks: deactivateForm.remarks || undefined });
-      setSuccess('Visitor card deactivated.'); setModal(null); load();
-    } catch (e) { setError(e.message); }
+      toast.success('Success', 'Visitor card deactivated.'); setModal(null); load();
+    } catch (e) { toast.error('Error', e.message); setFormError(e.message); }
     finally { setSubmitting(false); }
   };
 
@@ -114,9 +115,6 @@ export default function VisitorCards() {
         }
       />
 
-      {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
-      {success && <Alert type="success" message={success} onDismiss={() => setSuccess('')} />}
-
       {/* Filters */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[180px]">
@@ -149,7 +147,7 @@ export default function VisitorCards() {
       {/* Issue Modal */}
       <Modal isOpen={modal === 'issue'} onClose={() => setModal(null)} title="Issue Visitor Card">
         <form onSubmit={handleIssue} className="space-y-4">
-          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
           <SelectInput label="Company (Tenant)" required value={issueForm.tenant_id} onChange={e => setIssueForm(f => ({ ...f, tenant_id: e.target.value }))}>
             <option value="">Select company</option>
             {tenants.map(t => <option key={t._id} value={t._id}>{t.company_name} (quota: {t.visitor_card_quota})</option>)}
@@ -168,7 +166,7 @@ export default function VisitorCards() {
       {/* Deactivate Modal */}
       <Modal isOpen={modal === 'deactivate'} onClose={() => setModal(null)} title={`Deactivate Card #${editing?.badge_number}`}>
         <form onSubmit={handleDeactivate} className="space-y-4">
-          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
           <SelectInput label="Reason" required value={deactivateForm.deactivation_reason} onChange={e => setDeactivateForm(f => ({ ...f, deactivation_reason: e.target.value }))}>
             <option value="">Select reason</option>
             <option value="LOST">Lost</option>

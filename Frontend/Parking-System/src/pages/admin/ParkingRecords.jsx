@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { fetchParkingRecords, createParkingRecord, cancelParkingRecord, updateParkingRecord, fetchTenants, fetchEmployees, fetchRentalContracts } from '../../services/adminApi.js';
 import PageHeader from '../../Components/common/PageHeader.jsx';
 import DataTable from '../../Components/common/DataTable.jsx';
@@ -7,6 +7,7 @@ import Alert from '../../Components/common/Alert.jsx';
 import Modal from '../../Components/common/Modal.jsx';
 import StatusBadge from '../../Components/common/StatusBadge.jsx';
 import { TextInput, SelectInput, TextareaInput } from '../../Components/common/FormField.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
 
 const EMPTY_FORM = {
   employee_id: '', car_plate_number: '', parking_type: 'ASSIGNED',
@@ -15,14 +16,14 @@ const EMPTY_FORM = {
 };
 
 export default function ParkingRecords() {
+  const { toast } = useToast();
   const [records, setRecords] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [tenants, setTenants] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [contracts, setContracts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [formError, setFormError] = useState('');
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({ tenant_id: '', parking_type: '', status: '' });
   const [modal, setModal] = useState(null);
@@ -45,7 +46,7 @@ export default function ParkingRecords() {
       setRecords(recRes?.data?.records ?? []);
       setPagination(recRes?.data?.pagination ?? null);
       setTenants(tenRes?.data?.tenants ?? []);
-    } catch (e) { setError(e.message); }
+    } catch (e) { toast.error('Error', e.message); }
     finally { setLoading(false); }
   }, [page, filters]);
 
@@ -77,7 +78,7 @@ export default function ParkingRecords() {
   };
 
   const handleUpdate = async (e) => {
-    e.preventDefault(); setSubmitting(true); setError('');
+    e.preventDefault(); setSubmitting(true); setFormError('');
     try {
       const payload = {
         badge_id:       editing.editBadgeId       !== undefined ? (editing.editBadgeId       ? Number(editing.editBadgeId)       : null) : undefined,
@@ -93,8 +94,8 @@ export default function ParkingRecords() {
         } : {}),
       };
       await updateParkingRecord(editing._id, payload);
-      setSuccess('Parking record updated.'); setModal(null); load();
-    } catch (e) { setError(e.message); }
+      toast.success('Success', 'Parking record updated.'); setModal(null); load();
+    } catch (e) { toast.error('Error', e.message); setFormError(e.message); }
     finally { setSubmitting(false); }
   };
 
@@ -150,7 +151,7 @@ export default function ParkingRecords() {
   };
 
   const handleCreate = async (e) => {
-    e.preventDefault(); setSubmitting(true); setError('');
+    e.preventDefault(); setSubmitting(true); setFormError('');
     try {
       const payload = {
         employee_id: form.employee_id, car_plate_number: form.car_plate_number, parking_type: form.parking_type,
@@ -161,17 +162,17 @@ export default function ParkingRecords() {
         ...(form.parking_type === 'RENTAL' ? { rental_contract_id: form.rental_contract_id } : {}),
       };
       await createParkingRecord(payload);
-      setSuccess('Parking record created.'); setModal(null); load();
-    } catch (e) { setError(e.message); }
+      toast.success('Success', 'Parking record created.'); setModal(null); load();
+    } catch (e) { toast.error('Error', e.message); setFormError(e.message); }
     finally { setSubmitting(false); }
   };
 
   const handleCancel = async (e) => {
-    e.preventDefault(); setSubmitting(true); setError('');
+    e.preventDefault(); setSubmitting(true); setFormError('');
     try {
       await cancelParkingRecord(editing._id, { remarks: cancelForm.remarks || undefined });
-      setSuccess('Parking record cancelled.'); setModal(null); load();
-    } catch (e) { setError(e.message); }
+      toast.success('Success', 'Parking record cancelled.'); setModal(null); load();
+    } catch (e) { toast.error('Error', e.message); setFormError(e.message); }
     finally { setSubmitting(false); }
   };
 
@@ -219,9 +220,6 @@ export default function ParkingRecords() {
         }
       />
 
-      {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
-      {success && <Alert type="success" message={success} onDismiss={() => setSuccess('')} />}
-
       {/* Filters */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[180px]">
@@ -262,7 +260,7 @@ export default function ParkingRecords() {
       {/* Create Modal */}
       <Modal isOpen={modal === 'create'} onClose={() => setModal(null)} title="Assign Parking" size="large">
         <form onSubmit={handleCreate} className="space-y-5">
-          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
           <div>
             <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Filter by Company</label>
             <select value={tenantFilter} onChange={e => setTenantFilter(e.target.value)}
@@ -386,7 +384,7 @@ export default function ParkingRecords() {
       {/* Edit Modal */}
       <Modal isOpen={modal === 'edit'} onClose={() => setModal(null)} title="Edit Parking Record" size="large">
         <form onSubmit={handleUpdate} className="space-y-5">
-          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
 
           {/* Read-only summary */}
           <div className="rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 grid grid-cols-2 gap-3 text-[13px]">
@@ -467,7 +465,7 @@ export default function ParkingRecords() {
       {/* Cancel Modal */}
       <Modal isOpen={modal === 'cancel'} onClose={() => setModal(null)} title="Cancel Parking Record">
         <form onSubmit={handleCancel} className="space-y-4">
-          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
           <Alert type="warning" message={`Cancel parking for ${editing?.employee_id?.full_name} — plate ${editing?.car_plate_number}?`} />
           <TextareaInput label="Remarks" value={cancelForm.remarks} onChange={e => setCancelForm(f => ({ ...f, remarks: e.target.value }))} placeholder="Reason for cancellation..." />
           <div className="flex justify-end gap-3 pt-2">

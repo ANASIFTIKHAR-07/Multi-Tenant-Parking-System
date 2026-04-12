@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { fetchTenants, createTenant, updateTenant, deleteTenant, fetchUnits } from '../../services/adminApi.js';
 import PageHeader from '../../Components/common/PageHeader.jsx';
 import DataTable from '../../Components/common/DataTable.jsx';
@@ -7,16 +7,17 @@ import Alert from '../../Components/common/Alert.jsx';
 import Modal from '../../Components/common/Modal.jsx';
 import StatusBadge from '../../Components/common/StatusBadge.jsx';
 import { TextInput, SelectInput, TextareaInput } from '../../Components/common/FormField.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
 
 const EMPTY = { unit_id: '', qb_code: '', company_name: '', status: 'ACTIVE', lease_start: '', lease_end: '', visitor_card_quota: 0, remarks: '' };
 
 export default function Tenants() {
+  const { toast } = useToast();
   const [tenants, setTenants] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [units, setUnits] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [formError, setFormError] = useState('');
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({ status: '', floor: '' });
   const [modal, setModal] = useState(null);
@@ -36,7 +37,7 @@ export default function Tenants() {
       setTenants(tenantsRes?.data?.tenants ?? []);
       setPagination(tenantsRes?.data?.pagination ?? null);
       setUnits(unitsRes?.data?.units ?? []);
-    } catch (e) { setError(e.message); }
+    } catch (e) { toast.error('Error', e.message); }
     finally { setLoading(false); }
   }, [page, filters]);
 
@@ -60,29 +61,29 @@ export default function Tenants() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); setSubmitting(true); setError('');
+    e.preventDefault(); setSubmitting(true); setFormError('');
     try {
       const payload = { ...form, visitor_card_quota: Number(form.visitor_card_quota), lease_start: form.lease_start || undefined, lease_end: form.lease_end || undefined, qb_code: form.qb_code || undefined, remarks: form.remarks || undefined };
-      if (editing) { await updateTenant(editing._id, payload); setSuccess('Tenant updated.'); }
-      else { await createTenant(payload); setSuccess('Tenant created.'); }
+      if (editing) { await updateTenant(editing._id, payload); toast.success('Success', 'Tenant updated.'); }
+      else { await createTenant(payload); toast.success('Success', 'Tenant created.'); }
       setModal(null); load();
-    } catch (e) { setError(e.message); }
+    } catch (e) { toast.error('Error', e.message); setFormError(e.message); }
     finally { setSubmitting(false); }
   };
 
   const handleQuotaSubmit = async (e) => {
-    e.preventDefault(); setSubmitting(true); setError('');
+    e.preventDefault(); setSubmitting(true); setFormError('');
     try {
       await updateTenant(editing._id, { parking_quota: { assigned: { allocated: Number(quotaForm.assigned) }, pool: { allocated: Number(quotaForm.pool) }, rental: { allocated: Number(quotaForm.rental) } } });
-      setSuccess('Parking quota updated.'); setQuotaModal(false); load();
-    } catch (e) { setError(e.message); }
+      toast.success('Success', 'Parking quota updated.'); setQuotaModal(false); load();
+    } catch (e) { toast.error('Error', e.message); setFormError(e.message); }
     finally { setSubmitting(false); }
   };
 
   const handleDelete = async (t) => {
     if (!confirm(`Delete tenant "${t.company_name}"?`)) return;
-    try { await deleteTenant(t._id); setSuccess('Tenant deleted.'); load(); }
-    catch (e) { setError(e.message); }
+    try { await deleteTenant(t._id); toast.success('Success', 'Tenant deleted.'); load(); }
+    catch (e) { toast.error('Error', e.message); }
   };
 
   const columns = [
@@ -143,9 +144,6 @@ export default function Tenants() {
         }
       />
 
-      {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
-      {success && <Alert type="success" message={success} onDismiss={() => setSuccess('')} />}
-
       {/* Filters */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[140px]">
@@ -174,7 +172,7 @@ export default function Tenants() {
       {/* Tenant Form Modal */}
       <Modal isOpen={modal === 'form'} onClose={() => setModal(null)} title={editing ? 'Edit Tenant' : 'Add Tenant'} size="large">
         <form onSubmit={handleSubmit} className="space-y-5">
-          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
           <div className="grid grid-cols-2 gap-4">
             <TextInput label="Company Name" required value={form.company_name} onChange={e => setForm(f => ({ ...f, company_name: e.target.value }))} placeholder="Acme Corp" />
             <TextInput label="QB Code" value={form.qb_code} onChange={e => setForm(f => ({ ...f, qb_code: e.target.value }))} placeholder="QB-001" />
@@ -206,7 +204,7 @@ export default function Tenants() {
       {/* Quota Modal */}
       <Modal isOpen={!!quotaModal} onClose={() => setQuotaModal(false)} title={`Parking Quota — ${editing?.company_name}`}>
         <form onSubmit={handleQuotaSubmit} className="space-y-4">
-          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
           <p className="text-sm text-slate-500">Set the number of allocated parking slots per type for this tenant.</p>
           <div className="grid grid-cols-3 gap-4">
             <TextInput label="Assigned" type="number" min="0" value={quotaForm.assigned} onChange={e => setQuotaForm(f => ({ ...f, assigned: e.target.value }))} />

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { fetchEmployees, createEmployee, updateEmployee, deleteEmployee, addVehicle, removeVehicle, fetchTenants } from '../../services/adminApi.js';
 import PageHeader from '../../Components/common/PageHeader.jsx';
 import DataTable from '../../Components/common/DataTable.jsx';
@@ -7,17 +7,18 @@ import Alert from '../../Components/common/Alert.jsx';
 import Modal from '../../Components/common/Modal.jsx';
 import StatusBadge from '../../Components/common/StatusBadge.jsx';
 import { TextInput, SelectInput, TextareaInput } from '../../Components/common/FormField.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
 
 const EMPTY_EMP = { tenant_id: '', full_name: '', id_card_number: '', job_title: '', status: 'ACTIVE', remarks: '' };
 const EMPTY_VEH = { car_plate_number: '', sticker_number: '', car_tag: '', is_primary: false };
 
 export default function Employees() {
+  const { toast } = useToast();
   const [employees, setEmployees] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [formError, setFormError] = useState('');
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({ tenant_id: '', status: '' });
   const [modal, setModal] = useState(null);
@@ -37,7 +38,7 @@ export default function Employees() {
       setEmployees(empRes?.data?.employees ?? []);
       setPagination(empRes?.data?.pagination ?? null);
       setTenants(tenRes?.data?.tenants ?? []);
-    } catch (e) { setError(e.message); }
+    } catch (e) { toast.error('Error', e.message); }
     finally { setLoading(false); }
   }, [page, filters]);
 
@@ -52,36 +53,36 @@ export default function Employees() {
   const openAddVehicle = (emp) => { setEditing(emp); setVehicleForm(EMPTY_VEH); setModal('vehicle'); };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); setSubmitting(true); setError('');
+    e.preventDefault(); setSubmitting(true); setFormError('');
     try {
       const payload = { ...form, id_card_number: form.id_card_number || undefined, job_title: form.job_title || undefined, remarks: form.remarks || undefined };
-      if (editing) { await updateEmployee(editing._id, payload); setSuccess('Employee updated.'); }
-      else { await createEmployee(payload); setSuccess('Employee created.'); }
+      if (editing) { await updateEmployee(editing._id, payload); toast.success('Success', 'Employee updated.'); }
+      else { await createEmployee(payload); toast.success('Success', 'Employee created.'); }
       setModal(null); load();
-    } catch (e) { setError(e.message); }
+    } catch (e) { toast.error('Error', e.message); setFormError(e.message); }
     finally { setSubmitting(false); }
   };
 
   const handleAddVehicle = async (e) => {
-    e.preventDefault(); setSubmitting(true); setError('');
+    e.preventDefault(); setSubmitting(true); setFormError('');
     try {
       const payload = { car_plate_number: vehicleForm.car_plate_number, sticker_number: vehicleForm.sticker_number || undefined, car_tag: vehicleForm.car_tag ? Number(vehicleForm.car_tag) : undefined, is_primary: vehicleForm.is_primary };
       await addVehicle(editing._id, payload);
-      setSuccess('Vehicle added.'); setModal(null); load();
-    } catch (e) { setError(e.message); }
+      toast.success('Success', 'Vehicle added.'); setModal(null); load();
+    } catch (e) { toast.error('Error', e.message); setFormError(e.message); }
     finally { setSubmitting(false); }
   };
 
   const handleRemoveVehicle = async (empId, plate) => {
     if (!confirm(`Remove vehicle ${plate}?`)) return;
-    try { await removeVehicle(empId, plate); setSuccess('Vehicle removed.'); load(); }
-    catch (e) { setError(e.message); }
+    try { await removeVehicle(empId, plate); toast.success('Success', 'Vehicle removed.'); load(); }
+    catch (e) { toast.error('Error', e.message); }
   };
 
   const handleDelete = async (emp) => {
     if (!confirm(`Delete employee "${emp.full_name}"?`)) return;
-    try { await deleteEmployee(emp._id); setSuccess('Employee deleted.'); load(); }
-    catch (e) { setError(e.message); }
+    try { await deleteEmployee(emp._id); toast.success('Success', 'Employee deleted.'); load(); }
+    catch (e) { toast.error('Error', e.message); }
   };
 
   const columns = [
@@ -136,9 +137,6 @@ export default function Employees() {
         }
       />
 
-      {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
-      {success && <Alert type="success" message={success} onDismiss={() => setSuccess('')} />}
-
       {/* Filters */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[180px]">
@@ -169,7 +167,7 @@ export default function Employees() {
       {/* Employee Form Modal */}
       <Modal isOpen={modal === 'form'} onClose={() => setModal(null)} title={editing ? 'Edit Employee' : 'Add Employee'} size="large">
         <form onSubmit={handleSubmit} className="space-y-5">
-          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
           <div className="grid grid-cols-2 gap-4">
             <TextInput label="Full Name" required value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="John Doe" />
             <TextInput label="ID Card Number" value={form.id_card_number} onChange={e => setForm(f => ({ ...f, id_card_number: e.target.value }))} placeholder="ID-12345" />
@@ -198,7 +196,7 @@ export default function Employees() {
       {/* Add Vehicle Modal */}
       <Modal isOpen={modal === 'vehicle'} onClose={() => setModal(null)} title={`Add Vehicle — ${editing?.full_name}`}>
         <form onSubmit={handleAddVehicle} className="space-y-4">
-          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
           <TextInput label="Car Plate Number" required value={vehicleForm.car_plate_number} onChange={e => setVehicleForm(f => ({ ...f, car_plate_number: e.target.value }))} placeholder="ABC-1234" />
           <div className="grid grid-cols-2 gap-4">
             <TextInput label="Sticker Number" value={vehicleForm.sticker_number} onChange={e => setVehicleForm(f => ({ ...f, sticker_number: e.target.value }))} placeholder="STK-001" />

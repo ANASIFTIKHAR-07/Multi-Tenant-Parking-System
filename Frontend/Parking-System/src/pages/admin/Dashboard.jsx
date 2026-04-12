@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchTenants, fetchEmployees, fetchParkingRecords, fetchBadges, fetchRentalContracts, fetchVisitorCards } from '../../services/adminApi.js';
 import StatCard from '../../Components/common/StatCard.jsx';
@@ -22,25 +22,33 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
+    let cancelled = false;
+
+    Promise.allSettled([
       fetchTenants({ limit: 6 }),
       fetchEmployees({ limit: 1 }),
       fetchParkingRecords({ limit: 5, status: 'ACTIVE' }),
       fetchBadges({ limit: 1, status: 'ACTIVE' }),
       fetchRentalContracts({ limit: 1, status: 'ACTIVE' }),
       fetchVisitorCards({ limit: 1 }),
-    ]).then(([tenants, employees, parking, badges, contracts, visitors]) => {
+    ]).then((results) => {
+      if (cancelled) return;
+      const [tenants, employees, parking, badges, contracts, visitors] = results.map(
+        r => r.status === 'fulfilled' ? r.value : null
+      );
       setStats({
-        tenants:             tenants?.data?.pagination?.total ?? 0,
-        employees:           employees?.data?.pagination?.total ?? 0,
-        activeParkingRecords:parking?.data?.pagination?.total ?? 0,
-        activeBadges:        badges?.data?.pagination?.total ?? 0,
-        activeContracts:     contracts?.data?.pagination?.total ?? 0,
-        visitorCards:        visitors?.data?.pagination?.total ?? 0,
+        tenants:              tenants?.data?.pagination?.total  ?? 0,
+        employees:            employees?.data?.pagination?.total ?? 0,
+        activeParkingRecords: parking?.data?.pagination?.total  ?? 0,
+        activeBadges:         badges?.data?.pagination?.total   ?? 0,
+        activeContracts:      contracts?.data?.pagination?.total ?? 0,
+        visitorCards:         visitors?.data?.pagination?.total  ?? 0,
       });
-      setRecentTenants(tenants?.data?.tenants ?? []);
-      setRecentParking(parking?.data?.records ?? []);
-    }).catch(console.error).finally(() => setLoading(false));
+      setRecentTenants(tenants?.data?.tenants  ?? []);
+      setRecentParking(parking?.data?.records  ?? []);
+    }).finally(() => { if (!cancelled) setLoading(false); });
+
+    return () => { cancelled = true; };
   }, []);
 
   const hour = new Date().getHours();

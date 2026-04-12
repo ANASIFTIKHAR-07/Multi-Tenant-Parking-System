@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 const SIZES = {
   small:  'max-w-sm',
@@ -8,14 +8,21 @@ const SIZES = {
 };
 
 export default function Modal({ isOpen, onClose, title, children, size = 'medium', closeOnOverlayClick = true }) {
+  // Track overflow state so we always restore it correctly
+  const prevOverflow = useRef('');
+
   useEffect(() => {
     if (!isOpen) return;
+
+    prevOverflow.current = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
+
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
+      document.body.style.overflow = prevOverflow.current;
     };
   }, [isOpen, onClose]);
 
@@ -24,12 +31,17 @@ export default function Modal({ isOpen, onClose, title, children, size = 'medium
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
-      onClick={closeOnOverlayClick ? (e) => { if (e.target === e.currentTarget) onClose(); } : undefined}
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby={title ? 'modal-title' : undefined}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]" onClick={closeOnOverlayClick ? onClose : undefined} />
+      <div
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]"
+        onClick={closeOnOverlayClick ? onClose : undefined}
+      />
 
-      {/* Sheet — slides up on mobile, centered on desktop */}
+      {/* Panel */}
       <div
         className={`
           relative w-full bg-white shadow-2xl z-10 flex flex-col
@@ -39,7 +51,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'medium
         `}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Handle bar (mobile) */}
+        {/* Mobile drag handle */}
         <div className="sm:hidden flex justify-center pt-3 pb-1 flex-shrink-0">
           <div className="w-10 h-1 rounded-full bg-slate-200" />
         </div>
@@ -47,10 +59,10 @@ export default function Modal({ isOpen, onClose, title, children, size = 'medium
         {/* Header */}
         {title && (
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 flex-shrink-0">
-            <h2 className="text-[15px] font-semibold text-slate-900">{title}</h2>
+            <h2 id="modal-title" className="text-[15px] font-semibold text-slate-900">{title}</h2>
             <button
               onClick={onClose}
-              aria-label="Close"
+              aria-label="Close dialog"
               className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

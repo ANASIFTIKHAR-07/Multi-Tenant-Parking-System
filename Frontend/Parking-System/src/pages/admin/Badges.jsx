@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { fetchBadges, issueAccessBadge, deactivateBadge, fetchTenants, fetchEmployees } from '../../services/adminApi.js';
 import PageHeader from '../../Components/common/PageHeader.jsx';
 import DataTable from '../../Components/common/DataTable.jsx';
@@ -7,17 +7,18 @@ import Alert from '../../Components/common/Alert.jsx';
 import Modal from '../../Components/common/Modal.jsx';
 import StatusBadge from '../../Components/common/StatusBadge.jsx';
 import { TextInput, SelectInput, TextareaInput } from '../../Components/common/FormField.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
 
 const DEACTIVATION_REASONS = ['STOLEN', 'DAMAGED', 'EMPLOYEE_LEFT', 'LOST', 'REPLACED', 'OTHER'];
 
 export default function Badges() {
+  const { toast } = useToast();
   const [badges, setBadges] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [tenants, setTenants] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [formError, setFormError] = useState('');
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({ tenant_id: '', status: '' });
   const [modal, setModal] = useState(null);
@@ -37,7 +38,7 @@ export default function Badges() {
       setBadges(badgesRes?.data?.badges ?? []);
       setPagination(badgesRes?.data?.pagination ?? null);
       setTenants(tenantsRes?.data?.tenants ?? []);
-    } catch (e) { setError(e.message); }
+    } catch (e) { toast.error('Error', e.message); }
     finally { setLoading(false); }
   }, [page, filters]);
 
@@ -54,21 +55,21 @@ export default function Badges() {
   const openDeactivate = (b) => { setEditing(b); setDeactivateForm({ deactivation_reason: '', remarks: '' }); setModal('deactivate'); };
 
   const handleIssue = async (e) => {
-    e.preventDefault(); setSubmitting(true); setError('');
+    e.preventDefault(); setSubmitting(true); setFormError('');
     try {
       const payload = { employee_id: form.employee_id, badge_number: Number(form.badge_number), sr_number: form.sr_number || undefined, sr_number_secondary: form.sr_number_secondary ? Number(form.sr_number_secondary) : undefined, access_level: form.access_level || undefined, access_level_description: form.access_level_description || undefined, remarks: form.remarks || undefined };
       await issueAccessBadge(payload);
-      setSuccess('Badge issued successfully.'); setModal(null); load();
-    } catch (e) { setError(e.message); }
+      toast.success('Success', 'Badge issued successfully.'); setModal(null); load();
+    } catch (e) { toast.error('Error', e.message); setFormError(e.message); }
     finally { setSubmitting(false); }
   };
 
   const handleDeactivate = async (e) => {
-    e.preventDefault(); setSubmitting(true); setError('');
+    e.preventDefault(); setSubmitting(true); setFormError('');
     try {
       await deactivateBadge(editing._id, { deactivation_reason: deactivateForm.deactivation_reason, remarks: deactivateForm.remarks || undefined });
-      setSuccess('Badge deactivated.'); setModal(null); load();
-    } catch (e) { setError(e.message); }
+      toast.success('Success', 'Badge deactivated.'); setModal(null); load();
+    } catch (e) { toast.error('Error', e.message); setFormError(e.message); }
     finally { setSubmitting(false); }
   };
 
@@ -112,9 +113,6 @@ export default function Badges() {
         }
       />
 
-      {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
-      {success && <Alert type="success" message={success} onDismiss={() => setSuccess('')} />}
-
       {/* Filters */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[180px]">
@@ -147,7 +145,7 @@ export default function Badges() {
       {/* Issue Badge Modal */}
       <Modal isOpen={modal === 'issue'} onClose={() => setModal(null)} title="Issue Access Badge" size="large">
         <form onSubmit={handleIssue} className="space-y-5">
-          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
           <div>
             <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Filter by Company</label>
             <select value={tenantFilter} onChange={e => setTenantFilter(e.target.value)}
@@ -182,7 +180,7 @@ export default function Badges() {
       {/* Deactivate Modal */}
       <Modal isOpen={modal === 'deactivate'} onClose={() => setModal(null)} title={`Deactivate Badge #${editing?.badge_number}`}>
         <form onSubmit={handleDeactivate} className="space-y-4">
-          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
           <Alert type="warning" message={`You are about to deactivate badge #${editing?.badge_number} for ${editing?.employee_id?.full_name}.`} />
           <SelectInput label="Deactivation Reason" required value={deactivateForm.deactivation_reason} onChange={e => setDeactivateForm(f => ({ ...f, deactivation_reason: e.target.value }))}>
             <option value="">Select reason</option>

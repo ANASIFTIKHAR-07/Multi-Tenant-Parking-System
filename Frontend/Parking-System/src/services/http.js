@@ -1,5 +1,6 @@
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
+// Single in-flight refresh promise — prevents parallel refresh storms
 let refreshInFlight = null;
 
 export async function tryRefreshSession() {
@@ -9,12 +10,12 @@ export async function tryRefreshSession() {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-    }).finally(() => {
-      refreshInFlight = null;
-    });
+    })
+      .then(r => r.ok)
+      .catch(() => false)          // network error → treat as failed
+      .finally(() => { refreshInFlight = null; });
   }
-  const res = await refreshInFlight;
-  return res.ok;
+  return refreshInFlight;
 }
 
 function buildUrl(path, query) {
@@ -29,31 +30,37 @@ function buildUrl(path, query) {
   return url;
 }
 
-function shouldSkipRefreshForPath(path) {
-  return (
-    path === '/auth/login' ||
-    path.startsWith('/auth/login?') ||
-    path === '/auth/refresh-token' ||
-    path.startsWith('/auth/refresh-token?')
-  );
+function shouldSkipRefresh(path) {
+  return path === '/auth/login' || path === '/auth/refresh-token';
 }
 
-async function httpRequestInternal(
-  path,
-  { method = 'GET', body, headers = {}, query } = {},
-  isRetry = false
-) {
+const REQUEST_TIMEOUT_MS = 15_000;
+
+async function httpRequestInternal(path, { method = 'GET', body, headers = {}, query } = {}, isRetry = false) {
   const url = buildUrl(path, query);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  const response = await fetch(url.toString(), {
-    method,
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...headers },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let response;
+  try {
+    response = await fetch(url.toString(), {
+      method,
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', ...headers },
+      body: body ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
+    });
+  } catch (err) {
+    if (err.name === 'AbortError') throw new Error('Request timed out. Please try again.');
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 
-  if (response.status === 401 && !isRetry && !shouldSkipRefreshForPath(path)) {
-    if (await tryRefreshSession()) {
+  // Auto-refresh on 401 (once, skip auth endpoints to avoid loops)
+  if (response.status === 401 && !isRetry && !shouldSkipRefresh(path)) {
+    const refreshed = await tryRefreshSession();
+    if (refreshed) {
       return httpRequestInternal(path, { method, body, headers, query }, true);
     }
   }
@@ -63,7 +70,7 @@ async function httpRequestInternal(
   const data = isJSON ? await response.json() : await response.text();
 
   if (!response.ok) {
-    const message = isJSON ? (data?.message || data?.error || 'Request failed') : data;
+    const message = isJSON ? (data?.message || data?.error || 'Request failed') : (data || 'Request failed');
     throw new Error(message);
   }
   return data;
@@ -73,6 +80,7 @@ export async function httpRequest(path, options) {
   return httpRequestInternal(path, options, false);
 }
 
+// ── CSV download helper ──────────────────────────────────────────────────────
 function filenameFromDisposition(cd) {
   if (!cd) return null;
   const m = /filename\*?=(?:UTF-8'')?["']?([^";\n]+)["']?/i.exec(cd);
@@ -82,29 +90,18 @@ function filenameFromDisposition(cd) {
 export async function downloadCsv(path, query) {
   const url = buildUrl(path, query);
 
-  const fetchCsv = () =>
-    fetch(url.toString(), {
-      method: 'GET',
-      credentials: 'include',
-    });
+  const doFetch = () => fetch(url.toString(), { method: 'GET', credentials: 'include' });
 
-  let response = await fetchCsv();
+  let response = await doFetch();
   if (response.status === 401) {
-    if (await tryRefreshSession()) {
-      response = await fetchCsv();
-    }
+    if (await tryRefreshSession()) response = await doFetch();
   }
 
   if (!response.ok) {
     const ct = response.headers.get('content-type') || '';
     let msg = 'Export failed';
     if (ct.includes('application/json')) {
-      try {
-        const j = await response.json();
-        msg = j.message || msg;
-      } catch {
-        /* ignore */
-      }
+      try { const j = await response.json(); msg = j.message || msg; } catch { /* ignore */ }
     } else {
       const t = await response.text();
       if (t) msg = t.slice(0, 200);
@@ -129,9 +126,9 @@ export async function downloadCsv(path, query) {
 }
 
 export const http = {
-  get: (path, options) => httpRequest(path, { ...options, method: 'GET' }),
-  post: (path, body, options) => httpRequest(path, { ...options, method: 'POST', body }),
+  get:   (path, options)       => httpRequest(path, { ...options, method: 'GET' }),
+  post:  (path, body, options) => httpRequest(path, { ...options, method: 'POST',  body }),
   patch: (path, body, options) => httpRequest(path, { ...options, method: 'PATCH', body }),
-  put: (path, body, options) => httpRequest(path, { ...options, method: 'PUT', body }),
-  del: (path, options) => httpRequest(path, { ...options, method: 'DELETE' }),
+  put:   (path, body, options) => httpRequest(path, { ...options, method: 'PUT',   body }),
+  del:   (path, options)       => httpRequest(path, { ...options, method: 'DELETE' }),
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { fetchRentalContracts, createRentalContract, updateRentalContract, deleteRentalContract, fetchTenants } from '../../services/adminApi.js';
 import PageHeader from '../../Components/common/PageHeader.jsx';
 import DataTable from '../../Components/common/DataTable.jsx';
@@ -7,16 +7,17 @@ import Alert from '../../Components/common/Alert.jsx';
 import Modal from '../../Components/common/Modal.jsx';
 import StatusBadge from '../../Components/common/StatusBadge.jsx';
 import { TextInput, SelectInput, TextareaInput } from '../../Components/common/FormField.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
 
 const EMPTY = { tenant_id: '', contract_ref_number: '', company_name: '', floor: '', unit: '', slots_allocated: '', duration_months: '', start_date: '', end_date: '', remarks: '' };
 
 export default function RentalContracts() {
+  const { toast } = useToast();
   const [contracts, setContracts] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [formError, setFormError] = useState('');
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({ tenant_id: '', status: '' });
   const [modal, setModal] = useState(null);
@@ -34,7 +35,7 @@ export default function RentalContracts() {
       setContracts(conRes?.data?.contracts ?? []);
       setPagination(conRes?.data?.pagination ?? null);
       setTenants(tenRes?.data?.tenants ?? []);
-    } catch (e) { setError(e.message); }
+    } catch (e) { toast.error('Error', e.message); }
     finally { setLoading(false); }
   }, [page, filters]);
 
@@ -47,20 +48,20 @@ export default function RentalContracts() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); setSubmitting(true); setError('');
+    e.preventDefault(); setSubmitting(true); setFormError('');
     try {
       const payload = { ...form, slots_allocated: Number(form.slots_allocated), duration_months: Number(form.duration_months), floor: form.floor || undefined, unit: form.unit || undefined, remarks: form.remarks || undefined };
-      if (editing) { await updateRentalContract(editing._id, payload); setSuccess('Contract updated.'); }
-      else { await createRentalContract(payload); setSuccess('Contract created.'); }
+      if (editing) { await updateRentalContract(editing._id, payload); toast.success('Success', 'Contract updated.'); }
+      else { await createRentalContract(payload); toast.success('Success', 'Contract created.'); }
       setModal(null); load();
-    } catch (e) { setError(e.message); }
+    } catch (e) { toast.error('Error', e.message); setFormError(e.message); }
     finally { setSubmitting(false); }
   };
 
   const handleDelete = async (c) => {
     if (!confirm(`Delete contract "${c.contract_ref_number}"?`)) return;
-    try { await deleteRentalContract(c._id); setSuccess('Contract deleted.'); load(); }
-    catch (e) { setError(e.message); }
+    try { await deleteRentalContract(c._id); toast.success('Success', 'Contract deleted.'); load(); }
+    catch (e) { toast.error('Error', e.message); }
   };
 
   const columns = [
@@ -109,9 +110,6 @@ export default function RentalContracts() {
         }
       />
 
-      {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
-      {success && <Alert type="success" message={success} onDismiss={() => setSuccess('')} />}
-
       {/* Filters */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[180px]">
@@ -144,7 +142,7 @@ export default function RentalContracts() {
       {/* Form Modal */}
       <Modal isOpen={modal === 'form'} onClose={() => setModal(null)} title={editing ? 'Edit Contract' : 'New Rental Contract'} size="large">
         <form onSubmit={handleSubmit} className="space-y-5">
-          {error && <Alert type="error" message={error} onDismiss={() => setError('')} />}
+          {formError && <Alert type="error" message={formError} onDismiss={() => setFormError('')} />}
           <SelectInput label="Tenant" required value={form.tenant_id} onChange={e => setForm(f => ({ ...f, tenant_id: e.target.value }))}>
             <option value="">Select tenant</option>
             {tenants.map(t => <option key={t._id} value={t._id}>{t.company_name}</option>)}

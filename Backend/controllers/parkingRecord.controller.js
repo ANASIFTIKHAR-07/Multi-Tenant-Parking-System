@@ -27,24 +27,7 @@ const getFullParkingRecord = async (recordId) => {
         });
 };
 
-// ─────────────────────────────────────────────
-// CREATE PARKING RECORD
-// POST /api/v1/parking
-//
-// Business rules per parking type:
-//
-//   ASSIGNED → assigned_slot (slot_code + floor_number) required
-//              slot_code must not be taken by another active record
-//              checks tenant assigned.allocated vs used quota
-//
-//   POOL     → no slot required
-//              checks tenant pool.allocated vs used quota
-//
-//   RENTAL   → rental_contract_id required
-//              contract must be ACTIVE and not fully used
-//              increments contract slots_used
-//              checks tenant rental.allocated vs used quota
-// ─────────────────────────────────────────────
+
 const createParkingRecord = asyncHandler(async (req, res) => {
     const {
         employee_id,
@@ -249,7 +232,7 @@ const getAllParkingRecords = asyncHandler(async (req, res) => {
     const filter = {};
     if (req.query.tenant_id)    filter.tenant_id    = req.query.tenant_id;
     if (req.query.parking_type) filter.parking_type = req.query.parking_type;
-    if (req.query.status)       filter.status       = req.query.status;
+    if (req.query.status)       filter.status       = req.query.status.toUpperCase();
 
     if (req.query.floor) {
         const { Unit } = await import("../models/unit.model.js");
