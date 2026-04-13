@@ -21,7 +21,7 @@ export default function DataTable({ columns, data, loading, emptyMessage = 'No r
     return (
       <div className="flex items-center justify-center py-16">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-7 h-7 border-[2.5px] border-blue-100 dark:border-slate-800/20 border-t-blue-600 rounded-full animate-spin" />
+          <div className="w-7 h-7 border-[2.5px] border-slate-200 dark:border-slate-700 border-t-slate-700 dark:border-t-slate-300 rounded-full animate-spin" />
           <span className="text-[13px] text-slate-400 dark:text-slate-500 font-medium">Loading...</span>
         </div>
       </div>
