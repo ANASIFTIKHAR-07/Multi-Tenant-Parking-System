@@ -98,16 +98,8 @@ function NavItem({ item, collapsed, onClick }) {
   );
 }
 
-function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
-  const navigate = useNavigate();
-  const { logout, admin } = useAuth();
-
-  const onLogout = async () => {
-    await logout();
-    navigate('/login', { replace: true });
-  };
-
-  const content = (
+function SidebarContent({ collapsed, setMobileOpen, onLogout, admin }) {
+  return (
     <div className="flex flex-col h-full bg-white dark:bg-slate-900">
       {/* Brand */}
       <div className={`flex items-center gap-3 h-16 px-4 border-b border-slate-100 dark:border-slate-800 flex-shrink-0 ${collapsed ? 'justify-center' : ''}`}>
@@ -168,7 +160,7 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
             </Link>
             <button
               onClick={onLogout}
-              className="mt-1 w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[12px] font-medium text-slate-400 dark:text-slate-500 hover:text-red-600 dark:text-red-400 hover:bg-red-50 dark:bg-red-500/10 transition-colors"
+              className="mt-1 w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[12px] font-medium text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -182,7 +174,7 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
               to="/admin/profile"
               onClick={() => setMobileOpen(false)}
               title="Profile"
-              className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 transition-colors"
+              className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center shadow-sm">
                 <span className="text-white text-[11px] font-bold leading-none">{admin?.name?.charAt(0)?.toUpperCase() || 'A'}</span>
@@ -191,7 +183,7 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
             <button
               onClick={onLogout}
               title="Sign out"
-              className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 dark:text-slate-500 hover:text-red-500 hover:bg-red-50 dark:bg-red-500/10 transition-colors"
+              className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 dark:text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -202,6 +194,16 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
       </div>
     </div>
   );
+}
+
+function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
+  const navigate = useNavigate();
+  const { logout, admin } = useAuth();
+
+  const onLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <>
@@ -209,11 +211,11 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
       <aside
         className={`hidden lg:flex flex-col border-r border-slate-200/70 flex-shrink-0 transition-all duration-200 relative ${collapsed ? 'w-[60px]' : 'w-[220px]'}`}
       >
-        {content}
+        <SidebarContent collapsed={collapsed} setMobileOpen={setMobileOpen} onLogout={onLogout} admin={admin} />
         {/* Collapse toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-[72px] w-6 h-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 dark:border-slate-700 transition-all shadow-sm z-10"
+          className="absolute -right-3 top-[72px] w-6 h-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600 transition-all shadow-sm z-10"
         >
           <svg className={`w-3 h-3 transition-transform duration-200 ${collapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
@@ -221,15 +223,15 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
         </button>
       </aside>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer — always expanded (collapsed=false) so labels are always visible */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div
             className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="relative w-[220px] flex flex-col shadow-2xl z-10">
-            {content}
+          <aside className="relative w-[260px] flex flex-col shadow-2xl z-10">
+            <SidebarContent collapsed={false} setMobileOpen={setMobileOpen} onLogout={onLogout} admin={admin} />
           </aside>
         </div>
       )}
