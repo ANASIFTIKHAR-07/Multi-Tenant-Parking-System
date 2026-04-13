@@ -109,10 +109,22 @@ function SidebarContent({ collapsed, setMobileOpen, onLogout, admin }) {
           </svg>
         </div>
         {!collapsed && (
-          <div className="min-w-0">
-            <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-none">ParkAdmin</p>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 leading-none font-medium tracking-wide">Management Suite</p>
-          </div>
+          <>
+            <div className="min-w-0 flex-1">
+              <p className="text-[13px] font-bold text-slate-900 dark:text-white leading-none">ParkAdmin</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 leading-none font-medium tracking-wide">Management Suite</p>
+            </div>
+            {/* Close button — mobile only */}
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="lg:hidden w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex-shrink-0"
+              aria-label="Close menu"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </>
         )}
       </div>
 
