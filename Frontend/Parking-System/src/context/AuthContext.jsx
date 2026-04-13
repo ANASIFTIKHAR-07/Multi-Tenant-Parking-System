@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as authApi from '../services/authApi.js';
+import { setToken, clearToken } from '../services/http.js';
 
 const AuthContext = createContext(null);
 
@@ -19,12 +20,15 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (credentials) => {
     const res = await authApi.login(credentials);
     const adminData = res?.message?.loggedInAdmin ?? null;
+    const accessToken = res?.message?.accessToken ?? null;
+    if (accessToken) setToken(accessToken); // persist for cross-origin Bearer auth
     setAdmin(adminData);
-    return adminData; // return the admin object so caller can navigate immediately
+    return adminData;
   }, []);
 
   const logout = useCallback(async () => {
     try { await authApi.logout(); } catch { /* best-effort */ }
+    clearToken(); // wipe the stored access token
     setAdmin(null);
   }, []);
 

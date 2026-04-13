@@ -1,5 +1,13 @@
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
+// ── Token helpers (localStorage) ─────────────────────────────────────────────
+// Cross-origin cookies are blocked by browsers between Vercel and Render.
+// We persist the access token in localStorage and send it as a Bearer header.
+const TOKEN_KEY = 'pk_access_token';
+export const getToken    = ()      => localStorage.getItem(TOKEN_KEY);
+export const setToken    = (token) => localStorage.setItem(TOKEN_KEY, token);
+export const clearToken  = ()      => localStorage.removeItem(TOKEN_KEY);
+
 // Single in-flight refresh promise — prevents parallel refresh storms
 let refreshInFlight = null;
 
@@ -11,8 +19,17 @@ export async function tryRefreshSession() {
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
     })
-      .then(r => r.ok)
-      .catch(() => false)          // network error → treat as failed
+      .then(async (r) => {
+        if (!r.ok) return false;
+        try {
+          const data = await r.json();
+          // Store the freshly issued access token
+          const newToken = data?.message?.accessToken || data?.data?.accessToken;
+          if (newToken) setToken(newToken);
+        } catch { /* ignore parse errors */ }
+        return true;
+      })
+      .catch(() => false)
       .finally(() => { refreshInFlight = null; });
   }
   return refreshInFlight;
@@ -43,10 +60,12 @@ async function httpRequestInternal(path, { method = 'GET', body, headers = {}, q
 
   let response;
   try {
+    const token = getToken();
+    const authHeader = token ? { 'Authorization': `Bearer ${token}` } : {};
     response = await fetch(url.toString(), {
       method,
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json', ...headers },
+      headers: { 'Content-Type': 'application/json', ...authHeader, ...headers },
       body: body ? JSON.stringify(body) : undefined,
       signal: controller.signal,
     });
