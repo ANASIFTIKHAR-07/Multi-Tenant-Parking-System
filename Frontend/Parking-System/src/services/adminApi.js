@@ -1,4 +1,4 @@
-import { http, downloadCsv } from './http.js';
+import { http, downloadCsv, uploadFile } from './http.js';
 
 // Units
 export const fetchUnits = (query) => http.get('/admin/units', { query });
@@ -56,3 +56,6 @@ export const exportParkingRecordsCSV = (query) => downloadCsv('/csv/parking-reco
 export const exportTenantsCSV = (query) => downloadCsv('/csv/tenants', query);
 export const exportBadgesCSV = (query) => downloadCsv('/csv/badges', query);
 export const exportRentalContractsCSV = (query) => downloadCsv('/csv/rental-contracts', query);
+
+// Master Data Import (Excel upload)
+export const importMasterData = (file) => uploadFile('/csv/master-import', file);

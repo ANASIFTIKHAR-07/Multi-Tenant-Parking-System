@@ -144,6 +144,44 @@ export async function downloadCsv(path, query) {
   URL.revokeObjectURL(objectUrl);
 }
 
+// ── File upload helper (multipart/form-data) ─────────────────────────────────
+export async function uploadFile(path, file, fieldName = 'file') {
+  const url = new URL(`${API_BASE_URL}${path}`);
+  const formData = new FormData();
+  formData.append(fieldName, file);
+
+  const token = getToken();
+  const authHeader = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+  let response = await fetch(url.toString(), {
+    method: 'POST',
+    credentials: 'include',
+    headers: { ...authHeader }, // Do NOT set Content-Type — browser sets it with boundary
+    body: formData,
+  });
+
+  // Auto-refresh on 401
+  if (response.status === 401) {
+    const refreshed = await tryRefreshSession();
+    if (refreshed) {
+      const retryToken = getToken();
+      const retryAuth = retryToken ? { 'Authorization': `Bearer ${retryToken}` } : {};
+      response = await fetch(url.toString(), {
+        method: 'POST',
+        credentials: 'include',
+        headers: { ...retryAuth },
+        body: formData,
+      });
+    }
+  }
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data?.message || 'Upload failed');
+  }
+  return data;
+}
+
 export const http = {
   get:   (path, options)       => httpRequest(path, { ...options, method: 'GET' }),
   post:  (path, body, options) => httpRequest(path, { ...options, method: 'POST',  body }),
