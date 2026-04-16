@@ -5,6 +5,7 @@ import xss from "xss-clean"
 import helmet from "helmet"
 import cors from "cors"
 import { ApiError } from "./utils/ApiError.js"
+import { ApiResponse } from "./utils/ApiResponse.js"
 
 
 
@@ -46,7 +47,11 @@ app.use("/api/v1/csv", csvRouter)
 
 // Health check — used by frontend to wake Render from cold start
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
+  res.status(200).json(new ApiResponse(200, "Server is healthy", {
+    status: "ok",
+    environment: process.env.NODE_ENV || "production",
+    timestamp: new Date().toISOString(),
+  }));
 });
 
 
