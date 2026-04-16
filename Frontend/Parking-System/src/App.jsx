@@ -1,5 +1,6 @@
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
@@ -19,6 +20,14 @@ import Reports from './pages/admin/Reports.jsx';
 import Profile from './pages/admin/Profile.jsx';
 
 function App() {
+
+  useEffect(() => {
+    const allowedOrigins = [
+      "https://utg-system.vercel.app",
+    ];
+    if (!allowedOrigins.includes(window.location.origin)) return;
+    fetch("https://multi-tenant-parking-system.onrender.com/health").catch(() => {});
+  }, []);
   return (
     <ThemeProvider>
       <ToastProvider>

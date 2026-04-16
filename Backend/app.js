@@ -44,6 +44,11 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/admin", adminRouter)
 app.use("/api/v1/csv", csvRouter)
 
+// Health check — used by frontend to wake Render from cold start
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 
 
 app.use((req, res) => {
