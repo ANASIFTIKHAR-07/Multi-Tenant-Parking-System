@@ -1,7 +1,7 @@
 import { http } from './http.js'
 
-export const login = (payload) =>
-  http.post('/auth/login', payload)
+export const login = (payload, onSlow) =>
+  http.post('/auth/login', payload, { onSlow })
 
 export const logout = () =>
   http.post('/auth/logout')

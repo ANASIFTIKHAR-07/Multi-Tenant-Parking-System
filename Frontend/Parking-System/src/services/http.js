@@ -51,12 +51,16 @@ function shouldSkipRefresh(path) {
   return path === '/auth/login' || path === '/auth/refresh-token';
 }
 
-const REQUEST_TIMEOUT_MS = 15_000;
+const REQUEST_TIMEOUT_MS = 60_000; // 60s — accounts for Render free-tier cold start (~30-50s)
+const SLOW_REQUEST_THRESHOLD_MS = 8_000; // warn user after 8s
 
-async function httpRequestInternal(path, { method = 'GET', body, headers = {}, query } = {}, isRetry = false) {
+async function httpRequestInternal(path, { method = 'GET', body, headers = {}, query, onSlow } = {}, isRetry = false) {
   const url = buildUrl(path, query);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  // Notify caller if the request is taking unusually long (Render cold start)
+  const slowTimer = onSlow ? setTimeout(() => onSlow(), SLOW_REQUEST_THRESHOLD_MS) : null;
 
   let response;
   try {
@@ -70,17 +74,18 @@ async function httpRequestInternal(path, { method = 'GET', body, headers = {}, q
       signal: controller.signal,
     });
   } catch (err) {
-    if (err.name === 'AbortError') throw new Error('Request timed out. Please try again.');
+    if (err.name === 'AbortError') throw new Error('Request timed out. The server may be starting up — please try again.');
     throw err;
   } finally {
     clearTimeout(timer);
+    if (slowTimer) clearTimeout(slowTimer);
   }
 
   // Auto-refresh on 401 (once, skip auth endpoints to avoid loops)
   if (response.status === 401 && !isRetry && !shouldSkipRefresh(path)) {
     const refreshed = await tryRefreshSession();
     if (refreshed) {
-      return httpRequestInternal(path, { method, body, headers, query }, true);
+      return httpRequestInternal(path, { method, body, headers, query, onSlow }, true);
     }
   }
 
@@ -96,7 +101,7 @@ async function httpRequestInternal(path, { method = 'GET', body, headers = {}, q
 }
 
 export async function httpRequest(path, options) {
-  return httpRequestInternal(path, options, false);
+  return httpRequestInternal(path, options ?? {}, false);
 }
 
 // ── CSV download helper ──────────────────────────────────────────────────────

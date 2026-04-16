@@ -17,11 +17,11 @@ export function AuthProvider({ children }) {
     return () => { cancelled = true; };
   }, []);
 
-  const login = useCallback(async (credentials) => {
-    const res = await authApi.login(credentials);
+  const login = useCallback(async (credentials, onSlow) => {
+    const res = await authApi.login(credentials, onSlow);
     const adminData = res?.message?.loggedInAdmin ?? null;
     const accessToken = res?.message?.accessToken ?? null;
-    if (accessToken) setToken(accessToken); // persist for cross-origin Bearer auth
+    if (accessToken) setToken(accessToken);
     setAdmin(adminData);
     return adminData;
   }, []);

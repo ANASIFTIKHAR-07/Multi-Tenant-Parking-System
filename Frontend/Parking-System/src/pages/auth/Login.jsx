@@ -7,6 +7,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [slowServer, setSlowServer] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { login, admin, loading } = useAuth();
@@ -21,9 +22,10 @@ export default function Login() {
     e.preventDefault();
     if (submitting) return;
     setError('');
+    setSlowServer(false);
     setSubmitting(true);
     try {
-      const adminData = await login(form);
+      const adminData = await login(form, () => setSlowServer(true));
       if (adminData) {
         navigate(location.state?.from?.pathname || '/admin/dashboard', { replace: true });
       }
@@ -32,6 +34,7 @@ export default function Login() {
       setError(e.message || 'Invalid credentials');
     } finally {
       setSubmitting(false);
+      setSlowServer(false);
     }
   };
 
@@ -60,11 +63,22 @@ export default function Login() {
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-200/80 overflow-hidden">
           <div className="px-6 pt-6 pb-5">
             {error && (
-              <div className="mb-5 flex items-start gap-2.5 px-3.5 py-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200">
+              <div className="mb-4 flex items-start gap-2.5 px-3.5 py-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
                 <svg className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
                 <p className="text-[13px] text-red-700 dark:text-red-400 font-medium">{error}</p>
+              </div>
+            )}
+
+            {slowServer && !error && (
+              <div className="mb-4 flex items-start gap-2.5 px-3.5 py-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+                <svg className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                </svg>
+                <p className="text-[13px] text-amber-700 dark:text-amber-400 font-medium">
+                  Server is waking up — this can take up to 30 seconds on first load.
+                </p>
               </div>
             )}
 
@@ -132,7 +146,7 @@ export default function Login() {
                 {submitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Signing in...
+                    {slowServer ? 'Waking up server...' : 'Signing in...'}
                   </>
                 ) : 'Sign In'}
               </button>
